@@ -9,19 +9,16 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/a-h/templ"
 	middleware "github.com/confy/godo/middleware"
+	views "github.com/confy/godo/views"
 	log "github.com/go-kit/log"
 )
 
 type Config struct {
-	Host     string
-	Port     string
-	LogLevel string
-	LogFile  string
+	Host string
+	Port string
 }
-
-// responseWriter is a minimal wrapper for http.ResponseWriter that allows the
-// written HTTP status code to be captured for logging.
 
 func addRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +26,7 @@ func addRoutes(mux *http.ServeMux) {
 			http.NotFound(w, r)
 			return
 		}
-		fmt.Fprintf(w, "Hello, world!")
+		templ.Handler(views.IndexPage("Hello, world!")).ServeHTTP(w, r)
 	}))
 }
 
