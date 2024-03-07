@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/a-h/templ"
-	middleware "github.com/confy/godo/middleware"
-	views "github.com/confy/godo/views"
-	log "github.com/go-kit/log"
+	"github.com/confy/godo/middleware"
+	"github.com/confy/godo/views"
+	"github.com/go-kit/log"
 )
 
 type Config struct {
@@ -20,14 +20,11 @@ type Config struct {
 	Port string
 }
 
-func addRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		templ.Handler(views.IndexPage("Hello, world!")).ServeHTTP(w, r)
-	}))
+func loadConfig() *Config {
+	return &Config{
+		Host: "localhost",
+		Port: "8080",
+	}
 }
 
 func NewServer(logger log.Logger, config *Config) http.Handler {
@@ -38,24 +35,23 @@ func NewServer(logger log.Logger, config *Config) http.Handler {
 	return handler
 }
 
-func main() {
-	config := &Config{
-		Host: "localhost",
-		Port: "8080",
-	}
-	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
+func addRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("/", handleRoot)
+}
 
-	srv := NewServer(logger, config)
-	httpServer := &http.Server{
-		Addr:    net.JoinHostPort(config.Host, config.Port),
-		Handler: srv,
+func handleRoot(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
 	}
+	templ.Handler(views.IndexPage("Hello, world!")).ServeHTTP(w, r)
+}
 
+func startServer(logger log.Logger, httpServer *http.Server) {
 	go func() {
-		logger.Log("msg", "Starting server...", "host", config.Host, "port", config.Port)
+		logger.Log("msg", "Starting server...", "host", httpServer.Addr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			fmt.Fprintf(os.Stderr, "Error listening and serving: %s\n", err)
+			logger.Log("err", fmt.Sprintf("Error listening and serving: %s", err))
 		}
 	}()
 
@@ -69,8 +65,23 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := httpServer.Shutdown(ctx); err != nil {
-		logger.Log("err", "Error shutting down http server: %s", err)
+		logger.Log("err", fmt.Sprintf("Error shutting down http server: %s", err))
 	}
 
 	logger.Log("msg", "Server gracefully stopped")
+}
+
+func main() {
+	config := loadConfig()
+
+	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
+
+	srv := NewServer(logger, config)
+	httpServer := &http.Server{
+		Addr:    net.JoinHostPort(config.Host, config.Port),
+		Handler: srv,
+	}
+
+	startServer(logger, httpServer)
 }
