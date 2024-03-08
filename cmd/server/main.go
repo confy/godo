@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -12,22 +12,24 @@ import (
 	"github.com/a-h/templ"
 	"github.com/confy/godo/middleware"
 	"github.com/confy/godo/views"
-	"github.com/go-kit/log"
+	// "github.com/go-kit/log"
 )
 
 type Config struct {
-	Host string
-	Port string
+	Host     string
+	Port     string
+	LogLevel slog.Level
 }
 
 func loadConfig() *Config {
 	return &Config{
-		Host: "localhost",
-		Port: "8080",
+		Host:     "localhost",
+		Port:     "8080",
+		LogLevel: slog.LevelDebug,
 	}
 }
 
-func NewServer(logger log.Logger, config *Config) http.Handler {
+func NewServer(logger *slog.Logger, config *Config) http.Handler {
 	mux := http.NewServeMux()
 	addRoutes(mux)
 
@@ -47,11 +49,11 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	templ.Handler(views.IndexPage("Hello, world!")).ServeHTTP(w, r)
 }
 
-func startServer(logger log.Logger, httpServer *http.Server) {
+func startServer(logger *slog.Logger, httpServer *http.Server) {
 	go func() {
-		logger.Log("msg", "Starting server...", "host", httpServer.Addr)
+		logger.Info("Starting server...", "host", httpServer.Addr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Log("err", fmt.Sprintf("Error listening and serving: %s", err))
+			logger.Error("msg", "Error listening and serving", "err", err)
 		}
 	}()
 
@@ -60,23 +62,26 @@ func startServer(logger log.Logger, httpServer *http.Server) {
 	signal.Notify(stop, os.Interrupt)
 
 	<-stop // Wait for SIGINT (Ctrl+C)
-	logger.Log("msg", "Shutting down server...")
+	logger.Info("Shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := httpServer.Shutdown(ctx); err != nil {
-		logger.Log("err", fmt.Sprintf("Error shutting down http server: %s", err))
+		logger.Error("msg", "Error shutting down http server", "err", err)
 	}
 
-	logger.Log("msg", "Server gracefully stopped")
+	logger.Info("Server gracefully stopped")
 }
 
 func main() {
 	config := loadConfig()
-
-	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
-
+	logOpts := &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelDebug,
+	}
+	logHandler := slog.NewTextHandler(os.Stderr, logOpts)
+	// logger := slog.
+	logger := slog.New(logHandler)
 	srv := NewServer(logger, config)
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Host, config.Port),
