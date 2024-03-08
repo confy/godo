@@ -12,9 +12,9 @@ import (
 	"github.com/a-h/templ"
 	"github.com/confy/godo/middleware"
 	"github.com/confy/godo/views"
-	// "github.com/go-kit/log"
 )
 
+// TODO split out and load from a config file
 type Config struct {
 	Host     string
 	Port     string
@@ -29,12 +29,26 @@ func loadConfig() *Config {
 	}
 }
 
-func NewServer(logger *slog.Logger, config *Config) http.Handler {
+func getLogger(config *Config) *slog.Logger {
+	logOpts := &slog.HandlerOptions{
+		AddSource: true,
+		Level:     config.LogLevel,
+	}
+	logHandler := slog.NewTextHandler(os.Stderr, logOpts)
+	logger := slog.New(logHandler)
+	return logger
+}
+
+func newServer(logger *slog.Logger, config *Config) *http.Server {
 	mux := http.NewServeMux()
 	addRoutes(mux)
 
 	handler := middleware.LoggingMiddleware(logger)(mux)
-	return handler
+	server := &http.Server{
+		Addr:    net.JoinHostPort(config.Host, config.Port),
+		Handler: handler,
+	}
+	return server
 }
 
 func addRoutes(mux *http.ServeMux) {
@@ -53,7 +67,7 @@ func startServer(logger *slog.Logger, httpServer *http.Server) {
 	go func() {
 		logger.Info("Starting server...", "host", httpServer.Addr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Error("msg", "Error listening and serving", "err", err)
+			logger.Error("Error listening and serving", "err", err)
 		}
 	}()
 
@@ -67,7 +81,7 @@ func startServer(logger *slog.Logger, httpServer *http.Server) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := httpServer.Shutdown(ctx); err != nil {
-		logger.Error("msg", "Error shutting down http server", "err", err)
+		logger.Error("Error shutting down http server", "err", err)
 	}
 
 	logger.Info("Server gracefully stopped")
@@ -75,18 +89,7 @@ func startServer(logger *slog.Logger, httpServer *http.Server) {
 
 func main() {
 	config := loadConfig()
-	logOpts := &slog.HandlerOptions{
-		AddSource: true,
-		Level:     slog.LevelDebug,
-	}
-	logHandler := slog.NewTextHandler(os.Stderr, logOpts)
-	// logger := slog.
-	logger := slog.New(logHandler)
-	srv := NewServer(logger, config)
-	httpServer := &http.Server{
-		Addr:    net.JoinHostPort(config.Host, config.Port),
-		Handler: srv,
-	}
-
-	startServer(logger, httpServer)
+	logger := getLogger(config)
+	server := newServer(logger, config)
+	startServer(logger, server)
 }

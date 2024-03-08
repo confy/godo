@@ -30,34 +30,19 @@ func (rw *responseWriter) WriteHeader(code int) {
 	rw.wroteHeader = true
 }
 
-// LoggingMiddleware logs the incoming HTTP request & its duration.
-
 func LoggingMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
-		fn := func(w http.ResponseWriter, r *http.Request) {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
 			defer func() {
 				if err := recover(); err != nil {
 					w.WriteHeader(http.StatusInternalServerError)
-					logger.Error(
-						"Error in logging middleware",
-						"err", err,
-						"trace", debug.Stack(),
-					)
+					logger.Error("Error in logging middleware", "err", err, "trace", debug.Stack())
 				}
 			}()
-
-			start := time.Now()
 			wrapped := wrapResponseWriter(w)
 			next.ServeHTTP(wrapped, r)
-			logger.Info(
-				"Served HTTP request",
-				"status", wrapped.status,
-				"method", r.Method,
-				"path", r.URL.EscapedPath(),
-				"duration", time.Since(start),
-			)
-		}
-
-		return http.HandlerFunc(fn)
+			logger.Info("Incoming request", "status", wrapped.status, "method", r.Method, "path", r.URL.EscapedPath(), "duration", time.Since(start))
+		})
 	}
 }
