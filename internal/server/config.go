@@ -24,7 +24,7 @@ func (c *Config) GetDbURL() (string, error) {
 	}
 
 	if len(url) == 0 {
-		return "", errors.New("No DB url given.")
+		return "", errors.New("no db url given")
 	}
 	return url, nil
 }
@@ -33,6 +33,7 @@ func LoadConfig() (*Config, error) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Fprintf(os.Stdout, ".env not found: %s\n", err)
+		return nil, err
 	}
 
 	host := os.Getenv("HOST")
@@ -41,7 +42,7 @@ func LoadConfig() (*Config, error) {
 	db_token := os.Getenv("DB_TOKEN")
 
 	if host == "" || port == "" || db_url == "" || db_token == "" {
-		return nil, errors.New("Missing required environment variable")
+		return nil, errors.New("missing required environment variable")
 	}
 
 	return &Config{
