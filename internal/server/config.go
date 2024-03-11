@@ -12,15 +12,15 @@ import (
 type Config struct {
 	Host     string
 	Port     string
-	DB_URL   string
-	DB_token string
+	DbURL    string
+	DbToken  string
 	LogLevel slog.Level
 }
 
 func (c *Config) GetDbURL() (string, error) {
-	url := c.DB_URL
-	if len(c.DB_token) > 0 {
-		url = url + "?authToken=" + c.DB_token
+	url := c.DbURL
+	if len(c.DbToken) > 0 {
+		url = url + "?authToken=" + c.DbToken
 	}
 
 	if len(url) == 0 {
@@ -38,17 +38,17 @@ func LoadConfig() (*Config, error) {
 
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
-	db_url := os.Getenv("DB_URL")
-	db_token := os.Getenv("DB_TOKEN")
+	DbURL := os.Getenv("DB_URL")
+	DbToken := os.Getenv("DB_TOKEN")
 
-	if host == "" || port == "" || db_url == "" || db_token == "" {
+	if host == "" || port == "" || DbURL == "" || DbToken == "" {
 		return nil, errors.New("missing required environment variable")
 	}
 
 	return &Config{
-		Host:     host,
-		Port:     port,
-		DB_URL:   db_url,
-		DB_token: db_token,
+		Host:    host,
+		Port:    port,
+		DbURL:   DbURL,
+		DbToken: DbToken,
 	}, nil
 }

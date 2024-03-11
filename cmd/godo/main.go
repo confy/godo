@@ -12,13 +12,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		AddSource: true,
-		Level:     config.LogLevel,
-	}))
+
+	logger := slog.New(
+		slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			AddSource: true,
+			Level:     config.LogLevel,
+		}),
+	)
 	slog.SetDefault(logger)
 
 	srv := server.New(logger, config)
 	server.Run(logger, srv)
-
 }
