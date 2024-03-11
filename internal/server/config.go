@@ -30,10 +30,12 @@ func (c *Config) GetDbURL() (string, error) {
 }
 
 func LoadConfig() (*Config, error) {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Fprintf(os.Stdout, ".env not found: %s\n", err)
-		return nil, err
+	if os.Getenv("APP_ENV") != "prod" {
+		err := godotenv.Load()
+		if err != nil {
+			fmt.Fprintf(os.Stdout, ".env not found: %s\n", err)
+			return nil, err
+		}
 	}
 
 	host := os.Getenv("HOST")
@@ -46,9 +48,10 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return &Config{
-		Host:    host,
-		Port:    port,
-		DbURL:   DbURL,
-		DbToken: DbToken,
+		Host:     host,
+		Port:     port,
+		DbURL:    DbURL,
+		DbToken:  DbToken,
+		LogLevel: slog.LevelDebug,
 	}, nil
 }
