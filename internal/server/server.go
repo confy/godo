@@ -10,24 +10,25 @@ import (
 	"time"
 
 	"github.com/a-h/templ"
+	"github.com/confy/godo/internal/db"
 	"github.com/confy/godo/internal/middleware"
 	"github.com/confy/godo/views"
 )
 
-
-func New(logger *slog.Logger, config *Config) *http.Server {
+func New(logger *slog.Logger, config *Config, db *db.Queries) *http.Server {
 	mux := http.NewServeMux()
-	addRoutes(mux)
+	addRoutes(mux, db)
 
 	handler := middleware.LoggingMiddleware(logger)(mux)
 	server := &http.Server{
-		Addr:    net.JoinHostPort(config.Host, config.Port),
-		Handler: handler,
+		Addr:     net.JoinHostPort(config.Host, config.Port),
+		Handler:  handler,
+		ErrorLog: slog.NewLogLogger(logger.Handler(), config.LogLevel),
 	}
 	return server
 }
 
-func addRoutes(mux *http.ServeMux) {
+func addRoutes(mux *http.ServeMux, db *db.Queries) {
 	mux.HandleFunc("/", handleRoot)
 }
 
@@ -62,4 +63,3 @@ func Run(logger *slog.Logger, httpServer *http.Server) {
 
 	logger.Info("Server gracefully stopped")
 }
-
