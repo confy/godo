@@ -18,4 +18,5 @@ func main() {
 
 	srv := server.New(logger, config)
 	server.Run(logger, srv)
+
 }
