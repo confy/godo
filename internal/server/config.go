@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -10,13 +9,24 @@ import (
 )
 
 type Config struct {
-	Host     string
-	Port     string
-	DbURL    string
-	DbToken  string
-	LogLevel slog.Level
-	AppEnv   string
-	UseHttps bool
+	Host               string
+	Port               string
+	DbURL              string
+	DbToken            string
+	LogLevel           slog.Level
+	AppEnv             string
+	UseHttps           bool
+	GithubClientID     string
+	GithubClientSecret string
+}
+
+// GetHostUrl returns the host URL
+func (c *Config) GetHostUrl() string {
+	protocol := "http"
+	if c.UseHttps {
+		protocol = "https"
+	}
+	return fmt.Sprintf("%s://%s:%s", protocol, c.Host, c.Port)
 }
 
 // GetDbURL returns the database URL with the auth token
@@ -33,11 +43,20 @@ func LoadConfig() (*Config, error) {
 			return nil, err
 		}
 	}
+	requiredEnvVars := []string{"APP_ENV", "HOST", "PORT", "DB_URL", "DB_TOKEN", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET"}
+	for _, envVar := range requiredEnvVars {
+		if os.Getenv(envVar) == "" {
+			return nil, fmt.Errorf("missing required environment variable: %s", envVar)
+		}
+	}
+
 	appEnv := os.Getenv("APP_ENV")
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
 	dbURL := os.Getenv("DB_URL")
 	dbToken := os.Getenv("DB_TOKEN")
+	githubClientID := os.Getenv("GITHUB_CLIENT_ID")
+	githubClientSecret := os.Getenv("GITHUB_CLIENT_SECRET")
 	useHttps := appEnv == "prod"
 
 	var logLevel slog.Level
@@ -52,17 +71,15 @@ func LoadConfig() (*Config, error) {
 		logLevel = slog.LevelDebug
 	}
 
-	if appEnv == "" || host == "" || port == "" || dbURL == "" || dbToken == "" {
-		return nil, errors.New("missing required environment variable")
-	}
-
 	return &Config{
-		Host:     host,
-		Port:     port,
-		DbURL:    dbURL,
-		DbToken:  dbToken,
-		LogLevel: logLevel,
-		AppEnv:   appEnv,
-		UseHttps: useHttps,
+		Host:               host,
+		Port:               port,
+		DbURL:              dbURL,
+		DbToken:            dbToken,
+		LogLevel:           logLevel,
+		AppEnv:             appEnv,
+		UseHttps:           useHttps,
+		GithubClientID:     githubClientID,
+		GithubClientSecret: githubClientSecret,
 	}, nil
 }

@@ -10,16 +10,25 @@ import (
 	"time"
 
 	"github.com/a-h/templ"
+	"github.com/alexedwards/scs/v2"
 	"github.com/confy/godo/internal/db"
 	"github.com/confy/godo/internal/middleware"
 	"github.com/confy/godo/views"
 )
 
-func New(logger *slog.Logger, config *Config, db *db.Queries) *http.Server {
+func New(logger *slog.Logger, config *Config, sessionManager *scs.SessionManager, db *db.Queries) *http.Server {
 	mux := http.NewServeMux()
 	addRoutes(mux, db)
 
+	// var githubOauthConfig = &oauth2.Config{
+	// 	RedirectURL:  config.GetHostUrl() + "/callback",
+	// 	ClientID:     config.GithubClientID,
+	// 	ClientSecret: config.GithubClientSecret,
+	// 	Endpoint:     github.Endpoint,
+	// }
+
 	handler := middleware.LoggingMiddleware(logger)(mux)
+	handler = sessionManager.LoadAndSave(handler)
 	server := &http.Server{
 		Addr:     net.JoinHostPort(config.Host, config.Port),
 		Handler:  handler,

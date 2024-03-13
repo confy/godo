@@ -25,12 +25,12 @@ func main() {
 		}),
 	)
 	slog.SetDefault(logger)
-	dbUrl, err := config.GetDbURL()
-	if err != nil {
-		panic(err)
-	}
+
+	// create a session manager
+	sessionManager := server.CreateSessionManager(config.UseHttps)
 
 	// connect to the database
+	dbUrl := config.GetDbURL()
 	conn, err := sql.Open("libsql", dbUrl)
 	if err != nil {
 		panic(err)
@@ -45,11 +45,7 @@ func main() {
 	}
 
 	database := db.New(conn)
-	database.CreateUser(ctx, db.CreateUserParams{
-		Email:    "me@adrian.ooo",
-		Username: "Adrian",
-	})
 
-	srv := server.New(logger, config, database)
+	srv := server.New(logger, config, sessionManager, database)
 	server.Run(logger, srv)
 }

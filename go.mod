@@ -10,6 +10,13 @@ require (
 )
 
 require (
+	github.com/golang/protobuf v1.5.3 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
+)
+
+require (
+	github.com/alexedwards/scs/v2 v2.7.0
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230512164433-5d1fd1a340c9 // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/libsql/sqlite-antlr4-parser v0.0.0-20230802215326-5cb5bb604475 // indirect
