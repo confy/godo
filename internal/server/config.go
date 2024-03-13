@@ -15,20 +15,16 @@ type Config struct {
 	DbURL    string
 	DbToken  string
 	LogLevel slog.Level
+	AppEnv   string
+	UseHttps bool
 }
 
-func (c *Config) GetDbURL() (string, error) {
-	url := c.DbURL
-	if len(c.DbToken) > 0 {
-		url = url + "?authToken=" + c.DbToken
-	}
-
-	if len(url) == 0 {
-		return "", errors.New("no db url given")
-	}
-	return url, nil
+// GetDbURL returns the database URL with the auth token
+func (c *Config) GetDbURL() string {
+	return c.DbURL + "?authToken=" + c.DbToken
 }
 
+// LoadConfig loads configuration from environment variables or an .env file if not in production
 func LoadConfig() (*Config, error) {
 	if os.Getenv("APP_ENV") != "prod" {
 		err := godotenv.Load()
@@ -37,11 +33,12 @@ func LoadConfig() (*Config, error) {
 			return nil, err
 		}
 	}
-
+	appEnv := os.Getenv("APP_ENV")
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
 	dbURL := os.Getenv("DB_URL")
 	dbToken := os.Getenv("DB_TOKEN")
+	useHttps := appEnv == "prod"
 
 	var logLevel slog.Level
 	switch os.Getenv("LOG_LEVEL") {
@@ -54,7 +51,8 @@ func LoadConfig() (*Config, error) {
 	default:
 		logLevel = slog.LevelDebug
 	}
-	if host == "" || port == "" || dbURL == "" || dbToken == "" {
+
+	if appEnv == "" || host == "" || port == "" || dbURL == "" || dbToken == "" {
 		return nil, errors.New("missing required environment variable")
 	}
 
@@ -64,5 +62,7 @@ func LoadConfig() (*Config, error) {
 		DbURL:    dbURL,
 		DbToken:  dbToken,
 		LogLevel: logLevel,
+		AppEnv:   appEnv,
+		UseHttps: useHttps,
 	}, nil
 }
