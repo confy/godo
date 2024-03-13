@@ -40,18 +40,29 @@ func LoadConfig() (*Config, error) {
 
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
-	DbURL := os.Getenv("DB_URL")
-	DbToken := os.Getenv("DB_TOKEN")
+	dbURL := os.Getenv("DB_URL")
+	dbToken := os.Getenv("DB_TOKEN")
 
-	if host == "" || port == "" || DbURL == "" || DbToken == "" {
+	var logLevel slog.Level
+	switch os.Getenv("LOG_LEVEL") {
+	case "debug":
+		logLevel = slog.LevelDebug
+	case "info":
+		logLevel = slog.LevelInfo
+	case "warn":
+		logLevel = slog.LevelWarn
+	default:
+		logLevel = slog.LevelDebug
+	}
+	if host == "" || port == "" || dbURL == "" || dbToken == "" {
 		return nil, errors.New("missing required environment variable")
 	}
 
 	return &Config{
 		Host:     host,
 		Port:     port,
-		DbURL:    DbURL,
-		DbToken:  DbToken,
-		LogLevel: slog.LevelDebug,
+		DbURL:    dbURL,
+		DbToken:  dbToken,
+		LogLevel: logLevel,
 	}, nil
 }
