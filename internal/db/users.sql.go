@@ -10,18 +10,24 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (login, email) VALUES (?, ?) RETURNING id, login, email
+INSERT INTO users (login, email, avatar_url) VALUES (?, ?, ?) RETURNING id, login, email, avatar_url
 `
 
 type CreateUserParams struct {
-	Login string
-	Email string
+	Login     string `json:"login"`
+	Email     string `json:"email"`
+	AvatarURL string `json:"avatar_url"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Login, arg.Email)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Login, arg.Email, arg.AvatarURL)
 	var i User
-	err := row.Scan(&i.ID, &i.Login, &i.Email)
+	err := row.Scan(
+		&i.ID,
+		&i.Login,
+		&i.Email,
+		&i.AvatarURL,
+	)
 	return i, err
 }
 
@@ -35,29 +41,39 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, login, email FROM users WHERE id = ?
+SELECT id, login, email, avatar_url FROM users WHERE id = ?
 `
 
 func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserById, id)
 	var i User
-	err := row.Scan(&i.ID, &i.Login, &i.Email)
+	err := row.Scan(
+		&i.ID,
+		&i.Login,
+		&i.Email,
+		&i.AvatarURL,
+	)
 	return i, err
 }
 
 const getUserByLogin = `-- name: GetUserByLogin :one
-SELECT id, login, email FROM users WHERE login = ?
+SELECT id, login, email, avatar_url FROM users WHERE login = ?
 `
 
 func (q *Queries) GetUserByLogin(ctx context.Context, login string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByLogin, login)
 	var i User
-	err := row.Scan(&i.ID, &i.Login, &i.Email)
+	err := row.Scan(
+		&i.ID,
+		&i.Login,
+		&i.Email,
+		&i.AvatarURL,
+	)
 	return i, err
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT id, login, email FROM users
+SELECT id, login, email, avatar_url FROM users
 `
 
 func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
@@ -69,7 +85,12 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 	var items []User
 	for rows.Next() {
 		var i User
-		if err := rows.Scan(&i.ID, &i.Login, &i.Email); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Login,
+			&i.Email,
+			&i.AvatarURL,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -84,16 +105,22 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE users SET login = ?, email = ? WHERE id = ?
+UPDATE users SET login = ?, email = ?, avatar_url = ? WHERE id = ?
 `
 
 type UpdateUserParams struct {
-	Login string
-	Email string
-	ID    int64
+	Login     string `json:"login"`
+	Email     string `json:"email"`
+	AvatarURL string `json:"avatar_url"`
+	ID        int64  `json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.ExecContext(ctx, updateUser, arg.Login, arg.Email, arg.ID)
+	_, err := q.db.ExecContext(ctx, updateUser,
+		arg.Login,
+		arg.Email,
+		arg.AvatarURL,
+		arg.ID,
+	)
 	return err
 }

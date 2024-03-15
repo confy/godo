@@ -7,3 +7,6 @@ sql:
       go:
         package: "db"
         out: "internal/db"
+        emit_json_tags: true
+        rename:
+          avatar_url: "AvatarURL"

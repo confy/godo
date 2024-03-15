@@ -9,18 +9,19 @@ import (
 )
 
 type Todo struct {
-	ID          int64
-	UserID      int64
-	CreatedAt   sql.NullTime
-	UpdatedAt   sql.NullTime
-	DeletedAt   sql.NullTime
-	Title       sql.NullString
-	Description sql.NullString
-	Done        interface{}
+	ID          int64          `json:"id"`
+	UserID      int64          `json:"user_id"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
+	DeletedAt   sql.NullTime   `json:"deleted_at"`
+	Title       sql.NullString `json:"title"`
+	Description sql.NullString `json:"description"`
+	Done        interface{}    `json:"done"`
 }
 
 type User struct {
-	ID    int64
-	Login string
-	Email string
+	ID        int64  `json:"id"`
+	Login     string `json:"login"`
+	Email     string `json:"email"`
+	AvatarURL string `json:"avatar_url"`
 }

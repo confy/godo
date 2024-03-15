@@ -15,10 +15,10 @@ INSERT INTO todos (user_id, title, description, done) VALUES (?, ?, ?, ?) RETURN
 `
 
 type CreateTodoParams struct {
-	UserID      int64
-	Title       sql.NullString
-	Description sql.NullString
-	Done        interface{}
+	UserID      int64          `json:"user_id"`
+	Title       sql.NullString `json:"title"`
+	Description sql.NullString `json:"description"`
+	Done        interface{}    `json:"done"`
 }
 
 func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) (Todo, error) {
@@ -112,10 +112,10 @@ UPDATE todos SET title = ?, description = ?, done = ? WHERE id = ?
 `
 
 type UpdateTodoParams struct {
-	Title       sql.NullString
-	Description sql.NullString
-	Done        interface{}
-	ID          int64
+	Title       sql.NullString `json:"title"`
+	Description sql.NullString `json:"description"`
+	Done        interface{}    `json:"done"`
+	ID          int64          `json:"id"`
 }
 
 func (q *Queries) UpdateTodo(ctx context.Context, arg UpdateTodoParams) error {
