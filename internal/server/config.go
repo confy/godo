@@ -20,8 +20,8 @@ type Config struct {
 	GithubClientSecret string
 }
 
-// GetHostUrl returns the host URL
-func (c *Config) GetHostUrl() string {
+// GetHostURL returns the host URL
+func (c *Config) GetHostURL() string {
 	protocol := "http"
 	if c.UseHttps {
 		protocol = "https"
@@ -41,12 +41,6 @@ func LoadConfig() (*Config, error) {
 		if err != nil {
 			fmt.Fprintf(os.Stdout, ".env not found: %s\n", err)
 			return nil, err
-		}
-	}
-	requiredEnvVars := []string{"APP_ENV", "HOST", "PORT", "DB_URL", "DB_TOKEN", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET"}
-	for _, envVar := range requiredEnvVars {
-		if os.Getenv(envVar) == "" {
-			return nil, fmt.Errorf("missing required environment variable: %s", envVar)
 		}
 	}
 
@@ -69,6 +63,16 @@ func LoadConfig() (*Config, error) {
 		logLevel = slog.LevelWarn
 	default:
 		logLevel = slog.LevelDebug
+	}
+
+	if appEnv == "" ||
+		host == "" ||
+		port == "" ||
+		dbURL == "" ||
+		dbToken == "" ||
+		githubClientID == "" ||
+		githubClientSecret == "" {
+		return nil, fmt.Errorf("missing one or more required environment variables")
 	}
 
 	return &Config{
