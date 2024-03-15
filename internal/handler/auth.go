@@ -12,7 +12,7 @@ import (
 
 func HandleAuthLogin(oauthConfig *oauth2.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Redirect to the oauth2 login page
+		// Redirect to the OAuth2 login page
 		http.Redirect(w, r, oauthConfig.AuthCodeURL("state"), http.StatusSeeOther)
 	}
 }
@@ -27,45 +27,51 @@ func HandleAuthCallback(sessionManager *scs.SessionManager, oauthConfig *oauth2.
 			http.Error(w, "Failed to exchange token", http.StatusInternalServerError)
 			return
 		}
-		// Get the user
 
-		resp, err := oauthConfig.Client(context.Background(), token).Get("https://api.github.com/user")
+		// Get the user information
+		user, err := getUserInfo(oauthConfig.Client(context.Background(), token))
 		if err != nil {
-			http.Error(w, "Failed to get user", http.StatusInternalServerError)
+			http.Error(w, "Failed to get user information", http.StatusInternalServerError)
 			return
 		}
 
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			http.Error(w, "Failed to get user", http.StatusInternalServerError)
-			return
-
-		}
-		decoder := json.NewDecoder(resp.Body)
-		var user db.CreateUserParams
-		err = decoder.Decode(&user)
-		if err != nil {
-			http.Error(w, "Failed to get user", http.StatusInternalServerError)
-			return
-		}
+		// Create or get the user in the database
 		dbUser, err := db.CreateOrGetUser(context.Background(), dbQueries, user)
-
 		if err != nil {
-			http.Error(w, "Failed to save user", http.StatusInternalServerError)
+			http.Error(w, "Failed to create or get user", http.StatusInternalServerError)
 			return
 		}
 
+		// Store user ID and token in the session
 		sessionManager.Put(r.Context(), "user_id", dbUser.ID)
 		sessionManager.Put(r.Context(), "token", token.AccessToken)
 
+		// Redirect to the original URL or home page
 		redirectURL := "/"
 		originalURL := sessionManager.PopString(r.Context(), "redirect")
 		if originalURL != "" {
 			redirectURL = originalURL
 		}
-
-		// Redirect to the home page
 		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 	}
+}
+
+func getUserInfo(client *http.Client) (db.CreateUserParams, error) {
+	resp, err := client.Get("https://api.github.com/user")
+	if err != nil {
+		return db.CreateUserParams{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return db.CreateUserParams{}, err
+	}
+
+	var user db.CreateUserParams
+	err = json.NewDecoder(resp.Body).Decode(&user)
+	if err != nil {
+		return db.CreateUserParams{}, err
+	}
+
+	return user, nil
 }
