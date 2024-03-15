@@ -68,7 +68,14 @@ func HandleAuthCallback(sessionManager *scs.SessionManager, oauthConfig *oauth2.
 		sessionManager.Put(r.Context(), "user_id", dbUser.ID)
 		sessionManager.Put(r.Context(), "token", token.AccessToken)
 
+		redirectURL := "/"
+
+		originalURL := sessionManager.PopString(r.Context(), "redirect")
+		if originalURL != "" {
+			redirectURL = originalURL
+		}
+
 		// Redirect to the home page
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 	}
 }
