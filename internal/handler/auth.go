@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/alexedwards/scs/v2"
@@ -50,26 +49,17 @@ func HandleAuthCallback(sessionManager *scs.SessionManager, oauthConfig *oauth2.
 			http.Error(w, "Failed to get user", http.StatusInternalServerError)
 			return
 		}
-		fmt.Printf("user: %v", user)
-
 		dbUser, err := db.CreateOrGetUser(context.Background(), dbQueries, user)
-
-		fmt.Printf("dbUser: %v", dbUser)
 
 		if err != nil {
 			http.Error(w, "Failed to save user", http.StatusInternalServerError)
 			return
 		}
 
-		// Save the user to the session
-		fmt.Printf("user: %v", dbUser.ID)
-		fmt.Printf("token: %v", token.AccessToken)
-
 		sessionManager.Put(r.Context(), "user_id", dbUser.ID)
 		sessionManager.Put(r.Context(), "token", token.AccessToken)
 
 		redirectURL := "/"
-
 		originalURL := sessionManager.PopString(r.Context(), "redirect")
 		if originalURL != "" {
 			redirectURL = originalURL
