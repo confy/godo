@@ -1,0 +1,15 @@
+package views
+
+import (
+    "github.com/confy/godo/internal/db")
+
+
+templ TestPage(User db.User) {
+	<html>
+		@headerComponent("Welcome")
+		<body>
+			<h1>Hello, {string(User.Login)}</h1>
+            <h1>{string(User.Email)}</h1>
+		</body>
+	</html>
+}

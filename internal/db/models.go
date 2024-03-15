@@ -20,7 +20,7 @@ type Todo struct {
 }
 
 type User struct {
-	ID       int64
-	Username string
-	Email    string
+	ID    int64
+	Login string
+	Email string
 }

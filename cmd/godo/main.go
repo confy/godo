@@ -26,10 +26,7 @@ func main() {
 	)
 	slog.SetDefault(logger)
 
-	// create a session manager
-	sessionManager := server.CreateSessionManager(config.UseHttps)
-
-	// connect to the database
+	// Connect to the database
 	dbUrl := config.GetDbURL()
 	conn, err := sql.Open("libsql", dbUrl)
 	if err != nil {
@@ -38,14 +35,14 @@ func main() {
 	defer conn.Close()
 	ctx := context.Background()
 
-	// create tables
+	// Create tables
 	err = db.CreateTables(ctx, conn)
 	if err != nil {
 		panic(err)
 	}
 
-	database := db.New(conn)
+	dbQueries := db.New(conn)
 
-	srv := server.New(logger, config, sessionManager, database)
+	srv := server.New(logger, config, dbQueries)
 	server.Run(logger, srv)
 }
