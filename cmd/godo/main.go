@@ -27,8 +27,8 @@ func main() {
 	slog.SetDefault(logger)
 
 	// Connect to the database
-	dbUrl := config.GetDbURL()
-	conn, err := sql.Open("libsql", dbUrl)
+	dbURL := config.GetDBURL()
+	conn, err := sql.Open("libsql", dbURL)
 	if err != nil {
 		panic(err)
 	}
@@ -41,6 +41,7 @@ func main() {
 		panic(err)
 	}
 
+	// delete tables during development
 	dbQueries := db.New(conn)
 
 	srv := server.New(logger, config, dbQueries)

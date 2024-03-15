@@ -17,7 +17,11 @@ import (
 	"golang.org/x/oauth2/github"
 )
 
-func addRoutes(mux *http.ServeMux, sessionManager *scs.SessionManager, oauthConfig *oauth2.Config, dbQueries *db.Queries) {
+func addRoutes(
+	mux *http.ServeMux,
+	sessionManager *scs.SessionManager,
+	oauthConfig *oauth2.Config,
+	dbQueries *db.Queries) {
 	mux.HandleFunc("/login", handler.HandleAuthLogin(oauthConfig))
 	mux.HandleFunc("/callback", handler.HandleAuthCallback(sessionManager, oauthConfig, dbQueries))
 	mux.HandleFunc("/", handler.HandleRoot)
@@ -29,7 +33,7 @@ func New(logger *slog.Logger, config *Config, dbQueries *db.Queries) *http.Serve
 
 	sessionManager := scs.New()
 	sessionManager.Cookie.SameSite = http.SameSiteStrictMode
-	sessionManager.Cookie.Secure = config.UseHttps
+	sessionManager.Cookie.Secure = config.UseHTTPS
 
 	oauthConfig := &oauth2.Config{
 		RedirectURL:  config.GetHostURL() + "/callback",
@@ -42,9 +46,13 @@ func New(logger *slog.Logger, config *Config, dbQueries *db.Queries) *http.Serve
 
 	handler := middleware.LoggingMiddleware(logger)(mux)
 	server := &http.Server{
-		Addr:     net.JoinHostPort(config.Host, config.Port),
-		Handler:  sessionManager.LoadAndSave(handler),
-		ErrorLog: slog.NewLogLogger(logger.Handler(), config.LogLevel),
+		Addr:              net.JoinHostPort(config.Host, config.Port),
+		Handler:           sessionManager.LoadAndSave(handler),
+		ErrorLog:          slog.NewLogLogger(logger.Handler(), config.LogLevel),
+		ReadTimeout:       1 * time.Second,
+		WriteTimeout:      1 * time.Second,
+		IdleTimeout:       30 * time.Second,
+		ReadHeaderTimeout: 2 * time.Second,
 	}
 	return server
 }

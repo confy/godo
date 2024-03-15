@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -11,11 +12,11 @@ import (
 type Config struct {
 	Host               string
 	Port               string
-	DbURL              string
-	DbToken            string
+	DBURL              string
+	DBToken            string
 	LogLevel           slog.Level
 	AppEnv             string
-	UseHttps           bool
+	UseHTTPS           bool
 	GithubClientID     string
 	GithubClientSecret string
 }
@@ -23,15 +24,15 @@ type Config struct {
 // GetHostURL returns the host URL
 func (c *Config) GetHostURL() string {
 	protocol := "http"
-	if c.UseHttps {
+	if c.UseHTTPS {
 		protocol = "https"
 	}
 	return fmt.Sprintf("%s://%s:%s", protocol, c.Host, c.Port)
 }
 
-// GetDbURL returns the database URL with the auth token
-func (c *Config) GetDbURL() string {
-	return c.DbURL + "?authToken=" + c.DbToken
+// GetDBURL returns the database URL with the auth token
+func (c *Config) GetDBURL() string {
+	return c.DBURL + "?authToken=" + c.DBToken
 }
 
 // LoadConfig loads configuration from environment variables or an .env file if not in production
@@ -51,7 +52,7 @@ func LoadConfig() (*Config, error) {
 	dbToken := os.Getenv("DB_TOKEN")
 	githubClientID := os.Getenv("GITHUB_CLIENT_ID")
 	githubClientSecret := os.Getenv("GITHUB_CLIENT_SECRET")
-	useHttps := appEnv == "prod"
+	useHTTPS := appEnv == "prod"
 
 	var logLevel slog.Level
 	switch os.Getenv("LOG_LEVEL") {
@@ -72,17 +73,17 @@ func LoadConfig() (*Config, error) {
 		dbToken == "" ||
 		githubClientID == "" ||
 		githubClientSecret == "" {
-		return nil, fmt.Errorf("missing one or more required environment variables")
+		return nil, errors.New("missing one or more required environment variables")
 	}
 
 	return &Config{
 		Host:               host,
 		Port:               port,
-		DbURL:              dbURL,
-		DbToken:            dbToken,
+		DBURL:              dbURL,
+		DBToken:            dbToken,
 		LogLevel:           logLevel,
 		AppEnv:             appEnv,
-		UseHttps:           useHttps,
+		UseHTTPS:           useHTTPS,
 		GithubClientID:     githubClientID,
 		GithubClientSecret: githubClientSecret,
 	}, nil

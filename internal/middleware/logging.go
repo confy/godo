@@ -42,7 +42,11 @@ func LoggingMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
 			}()
 			wrapped := wrapResponseWriter(w)
 			next.ServeHTTP(wrapped, r)
-			logger.Info("Incoming request", "status", wrapped.status, "method", r.Method, "path", r.URL.EscapedPath(), "duration", time.Since(start))
+			logger.Info("Incoming request",
+				"status", wrapped.status,
+				"method", r.Method, "path",
+				r.URL.EscapedPath(), "duration",
+				time.Since(start))
 		})
 	}
 }

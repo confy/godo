@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/confy/godo/internal/db"
@@ -17,7 +18,10 @@ func HandleAuthLogin(oauthConfig *oauth2.Config) http.HandlerFunc {
 	}
 }
 
-func HandleAuthCallback(sessionManager *scs.SessionManager, oauthConfig *oauth2.Config, dbQueries *db.Queries) http.HandlerFunc {
+func HandleAuthCallback(
+	sessionManager *scs.SessionManager,
+	oauthConfig *oauth2.Config,
+	dbQueries *db.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get the code from the query string
 		code := r.URL.Query().Get("code")
@@ -43,7 +47,7 @@ func HandleAuthCallback(sessionManager *scs.SessionManager, oauthConfig *oauth2.
 		}
 
 		// Store user ID and token in the session
-		sessionManager.Put(r.Context(), "user_id", dbUser.ID)
+		sessionManager.Put(r.Context(), "userID", dbUser.ID)
 		sessionManager.Put(r.Context(), "token", token.AccessToken)
 
 		// Redirect to the original URL or home page
@@ -57,7 +61,11 @@ func HandleAuthCallback(sessionManager *scs.SessionManager, oauthConfig *oauth2.
 }
 
 func getUserInfo(client *http.Client) (db.CreateUserParams, error) {
-	resp, err := client.Get("https://api.github.com/user")
+	// resp, err := client.Get("https://api.github.com/user")
+	resp, err := client.Do(&http.Request{
+		Method: http.MethodGet,
+		URL:    &url.URL{Scheme: "https", Host: "api.github.com", Path: "/user"},
+	})
 	if err != nil {
 		return db.CreateUserParams{}, err
 	}
