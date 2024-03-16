@@ -10,10 +10,10 @@ import (
 	"github.com/confy/godo/views"
 )
 
-func HandleTestPage(dbQueries *db.Queries, sessionManager *scs.SessionManager) http.HandlerFunc {
+func HandleTestPage(database *db.Queries, session *scs.SessionManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := sessionManager.GetInt64(r.Context(), "userID")
-		user, err := dbQueries.GetUserById(context.Background(), userID)
+		userID := session.GetInt64(r.Context(), "userID")
+		user, err := database.GetUserById(context.Background(), userID)
 		if err != nil {
 			http.Error(w, "Failed to get user", http.StatusInternalServerError)
 			return

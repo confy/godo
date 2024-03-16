@@ -42,8 +42,8 @@ func main() {
 	}
 
 	// delete tables during development
-	dbQueries := db.New(conn)
+	database := db.New(conn)
 
-	srv := server.New(logger, config, dbQueries)
+	srv := server.New(logger, config, database)
 	server.Run(logger, srv)
 }

@@ -30,11 +30,11 @@ func CreateTables(ctx context.Context, db *sql.DB) error {
 }
 
 // Create a new user or get an existing user
-func CreateOrGetUser(ctx context.Context, dbQueries *Queries, user CreateUserParams) (User, error) {
-	dbUser, err := dbQueries.GetUserByLogin(ctx, user.Login)
+func CreateOrGetUser(ctx context.Context, database *Queries, user CreateUserParams) (User, error) {
+	dbUser, err := database.GetUserByLogin(ctx, user.Login)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return dbQueries.CreateUser(ctx, user)
+			return database.CreateUser(ctx, user)
 		}
 	}
 	return dbUser, nil

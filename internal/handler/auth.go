@@ -11,48 +11,48 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func HandleAuthLogin(oauthConfig *oauth2.Config) http.HandlerFunc {
+func HandleAuthLogin(oauth *oauth2.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Redirect to the OAuth2 login page
-		http.Redirect(w, r, oauthConfig.AuthCodeURL("state"), http.StatusSeeOther)
+		http.Redirect(w, r, oauth.AuthCodeURL("state"), http.StatusSeeOther)
 	}
 }
 
 func HandleAuthCallback(
-	sessionManager *scs.SessionManager,
-	oauthConfig *oauth2.Config,
-	dbQueries *db.Queries) http.HandlerFunc {
+	session *scs.SessionManager,
+	oauth *oauth2.Config,
+	database *db.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get the code from the query string
 		code := r.URL.Query().Get("code")
 		// Exchange the code for a token
-		token, err := oauthConfig.Exchange(context.Background(), code)
+		token, err := oauth.Exchange(context.Background(), code)
 		if err != nil {
 			http.Error(w, "Failed to exchange token", http.StatusInternalServerError)
 			return
 		}
 
 		// Get the user information
-		user, err := getUserInfo(oauthConfig.Client(context.Background(), token))
+		user, err := getUserInfo(oauth.Client(context.Background(), token))
 		if err != nil {
 			http.Error(w, "Failed to get user information", http.StatusInternalServerError)
 			return
 		}
 
 		// Create or get the user in the database
-		dbUser, err := db.CreateOrGetUser(context.Background(), dbQueries, user)
+		dbUser, err := db.CreateOrGetUser(context.Background(), database, user)
 		if err != nil {
 			http.Error(w, "Failed to create or get user", http.StatusInternalServerError)
 			return
 		}
 
 		// Store user ID and token in the session
-		sessionManager.Put(r.Context(), "userID", dbUser.ID)
-		sessionManager.Put(r.Context(), "token", token.AccessToken)
+		session.Put(r.Context(), "userID", dbUser.ID)
+		session.Put(r.Context(), "token", token.AccessToken)
 
 		// Redirect to the original URL or home page
 		redirectURL := "/"
-		originalURL := sessionManager.PopString(r.Context(), "redirect")
+		originalURL := session.PopString(r.Context(), "redirect")
 		if originalURL != "" {
 			redirectURL = originalURL
 		}

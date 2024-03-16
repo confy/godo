@@ -19,35 +19,38 @@ import (
 
 func addRoutes(
 	mux *http.ServeMux,
-	sessionManager *scs.SessionManager,
-	oauthConfig *oauth2.Config,
-	dbQueries *db.Queries) {
-	mux.HandleFunc("/login", handler.HandleAuthLogin(oauthConfig))
-	mux.HandleFunc("/callback", handler.HandleAuthCallback(sessionManager, oauthConfig, dbQueries))
+	session *scs.SessionManager,
+	oauth *oauth2.Config,
+	database *db.Queries,
+) {
+	mux.HandleFunc("/login", handler.HandleAuthLogin(oauth))
+	mux.HandleFunc("/callback", handler.HandleAuthCallback(session, oauth, database))
 	mux.HandleFunc("/", handler.HandleRoot)
-	mux.HandleFunc("/test", middleware.RequireLogin(handler.HandleTestPage(dbQueries, sessionManager), sessionManager))
+	mux.HandleFunc("/test", middleware.RequireLogin(handler.HandleTestPage(database, session), session))
 }
 
-func New(logger *slog.Logger, config *Config, dbQueries *db.Queries) *http.Server {
+func New(logger *slog.Logger, config *Config, database *db.Queries) *http.Server {
 	mux := http.NewServeMux()
 
-	sessionManager := scs.New()
-	sessionManager.Cookie.SameSite = http.SameSiteStrictMode
-	sessionManager.Cookie.Secure = config.UseHTTPS
+	session := scs.New()
+	session.Cookie.SameSite = http.SameSiteStrictMode
+	session.Cookie.Secure = config.UseHTTPS
 
-	oauthConfig := &oauth2.Config{
+	oauth := &oauth2.Config{
 		RedirectURL:  config.GetHostURL() + "/callback",
 		ClientID:     config.GithubClientID,
 		ClientSecret: config.GithubClientSecret,
 		Endpoint:     github.Endpoint,
 	}
 
-	addRoutes(mux, sessionManager, oauthConfig, dbQueries)
+	addRoutes(mux, session, oauth, database)
 
 	handler := middleware.LoggingMiddleware(logger)(mux)
+	handler = session.LoadAndSave(handler)
+
 	server := &http.Server{
 		Addr:              net.JoinHostPort(config.Host, config.Port),
-		Handler:           sessionManager.LoadAndSave(handler),
+		Handler:           handler,
 		ErrorLog:          slog.NewLogLogger(logger.Handler(), config.LogLevel),
 		ReadTimeout:       1 * time.Second,
 		WriteTimeout:      1 * time.Second,
