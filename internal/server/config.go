@@ -46,13 +46,13 @@ func LoadConfig() (*Config, error) {
 	}
 
 	appEnv := os.Getenv("APP_ENV")
+	useHTTPS := appEnv == "prod"
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
 	dbURL := os.Getenv("DB_URL")
 	dbToken := os.Getenv("DB_TOKEN")
 	githubClientID := os.Getenv("GITHUB_CLIENT_ID")
 	githubClientSecret := os.Getenv("GITHUB_CLIENT_SECRET")
-	useHTTPS := appEnv == "prod"
 
 	var logLevel slog.Level
 	switch os.Getenv("LOG_LEVEL") {

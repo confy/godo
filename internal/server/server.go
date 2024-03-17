@@ -29,7 +29,7 @@ func addRoutes(
 	mux.HandleFunc("/test", middleware.RequireLogin(handler.HandleTestPage(database, session), session))
 }
 
-func New(logger *slog.Logger, config *Config, database *db.Queries) *http.Server {
+func New(config *Config, database *db.Queries) *http.Server {
 	mux := http.NewServeMux()
 
 	session := scs.New()
@@ -45,13 +45,13 @@ func New(logger *slog.Logger, config *Config, database *db.Queries) *http.Server
 
 	addRoutes(mux, session, oauth, database)
 
-	handler := middleware.LoggingMiddleware(logger)(mux)
+	handler := middleware.LoggingMiddleware()(mux)
 	handler = session.LoadAndSave(handler)
 
 	server := &http.Server{
 		Addr:              net.JoinHostPort(config.Host, config.Port),
 		Handler:           handler,
-		ErrorLog:          slog.NewLogLogger(logger.Handler(), config.LogLevel),
+		ErrorLog:          slog.NewLogLogger(slog.Default().Handler(), config.LogLevel),
 		ReadTimeout:       1 * time.Second,
 		WriteTimeout:      1 * time.Second,
 		IdleTimeout:       30 * time.Second,
@@ -60,11 +60,11 @@ func New(logger *slog.Logger, config *Config, database *db.Queries) *http.Server
 	return server
 }
 
-func Run(logger *slog.Logger, httpServer *http.Server) {
+func Run(httpServer *http.Server) {
 	go func() {
-		logger.Info("Starting server...", "host", httpServer.Addr)
+		slog.Info("Starting server...", "host", httpServer.Addr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Error("Error listening and serving", "err", err)
+			slog.Error("Error listening and serving", "err", err)
 		}
 	}()
 
@@ -73,13 +73,13 @@ func Run(logger *slog.Logger, httpServer *http.Server) {
 	signal.Notify(stop, os.Interrupt)
 
 	<-stop // Wait for SIGINT (Ctrl+C)
-	logger.Info("Shutting down server...")
+	slog.Info("Shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := httpServer.Shutdown(ctx); err != nil {
-		logger.Error("Error shutting down http server", "err", err)
+		slog.Error("Error shutting down http server", "err", err)
 	}
 
-	logger.Info("Server gracefully stopped")
+	slog.Info("Server gracefully stopped")
 }

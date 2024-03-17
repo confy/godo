@@ -41,9 +41,8 @@ func main() {
 		panic(err)
 	}
 
-	// delete tables during development
 	database := db.New(conn)
 
-	srv := server.New(logger, config, database)
-	server.Run(logger, srv)
+	srv := server.New(config, database)
+	server.Run(srv)
 }
