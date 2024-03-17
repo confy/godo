@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -18,7 +19,14 @@ func HandleTestPage(database *db.Queries, session *scs.SessionManager) http.Hand
 			http.Error(w, "Failed to get user", http.StatusInternalServerError)
 			return
 		}
-		templ.Handler(views.TestPage(user)).ServeHTTP(w, r)
+
+		todo, err := database.CreateTodo(context.Background(), db.CreateTodoParams{
+			UserID: user.ID,
+			Title:   "Test todo",
+			Description: sql.NullString{String: "This is a test todo", Valid: true},
+		})
+
+		templ.Handler(views.TestPage(user, todo)).ServeHTTP(w, r)
 	}
 }
 

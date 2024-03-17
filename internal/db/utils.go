@@ -11,11 +11,11 @@ import (
 var Schema string
 
 func dropTables(ctx context.Context, db *sql.DB) error {
-	_, err := db.ExecContext(ctx, "DROP TABLE IF EXISTS users")
+	_, err := db.ExecContext(ctx, "DROP TABLE IF EXISTS todos")
 	if err != nil {
 		return err
 	}
-	_, err = db.ExecContext(ctx, "DROP TABLE IF EXISTS todos")
+	_, err = db.ExecContext(ctx, "DROP TABLE IF EXISTS users")
 	return err
 }
 

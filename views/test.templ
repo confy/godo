@@ -1,15 +1,19 @@
 package views
 
 import (
-    "github.com/confy/godo/internal/db")
+    "github.com/confy/godo/internal/db"
+	"github.com/confy/godo/views/components"
+)
 
 
-templ TestPage(User db.User) {
+templ TestPage(User db.User, todo db.Todo) {
 	<html>
-		@headerComponent("Welcome")
+		@components.Header("Welcome")
 		<body>
 			<h1>Hello, {string(User.Login)}</h1>
             <h1>{string(User.Email)}</h1>
+			<br></br>
+			@components.Todo(todo)
 		</body>
 	</html>
 }

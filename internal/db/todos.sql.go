@@ -16,7 +16,7 @@ INSERT INTO todos (user_id, title, description, done) VALUES (?, ?, ?, ?) RETURN
 
 type CreateTodoParams struct {
 	UserID      int64          `json:"user_id"`
-	Title       sql.NullString `json:"title"`
+	Title       string         `json:"title"`
 	Description sql.NullString `json:"description"`
 	Done        interface{}    `json:"done"`
 }
@@ -112,7 +112,7 @@ UPDATE todos SET title = ?, description = ?, done = ? WHERE id = ?
 `
 
 type UpdateTodoParams struct {
-	Title       sql.NullString `json:"title"`
+	Title       string         `json:"title"`
 	Description sql.NullString `json:"description"`
 	Done        interface{}    `json:"done"`
 	ID          int64          `json:"id"`

@@ -14,7 +14,7 @@ type Todo struct {
 	CreatedAt   sql.NullTime   `json:"created_at"`
 	UpdatedAt   sql.NullTime   `json:"updated_at"`
 	DeletedAt   sql.NullTime   `json:"deleted_at"`
-	Title       sql.NullString `json:"title"`
+	Title       string         `json:"title"`
 	Description sql.NullString `json:"description"`
 	Done        interface{}    `json:"done"`
 }
