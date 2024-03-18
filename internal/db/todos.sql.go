@@ -18,7 +18,7 @@ type CreateTodoParams struct {
 	UserID      int64          `json:"user_id"`
 	Title       string         `json:"title"`
 	Description sql.NullString `json:"description"`
-	Done        interface{}    `json:"done"`
+	Done        sql.NullBool   `json:"done"`
 }
 
 func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) (Todo, error) {
@@ -114,7 +114,7 @@ UPDATE todos SET title = ?, description = ?, done = ? WHERE id = ?
 type UpdateTodoParams struct {
 	Title       string         `json:"title"`
 	Description sql.NullString `json:"description"`
-	Done        interface{}    `json:"done"`
+	Done        sql.NullBool   `json:"done"`
 	ID          int64          `json:"id"`
 }
 

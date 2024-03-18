@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS todos(
     deleted_at  DATETIME default null,
     title       TEXT NOT NULL,
     description TEXT,
-    done        INTEGER(1),
+    done        BOOLEAN default false,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

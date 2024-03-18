@@ -16,7 +16,7 @@ type Todo struct {
 	DeletedAt   sql.NullTime   `json:"deleted_at"`
 	Title       string         `json:"title"`
 	Description sql.NullString `json:"description"`
-	Done        interface{}    `json:"done"`
+	Done        sql.NullBool   `json:"done"`
 }
 
 type User struct {
