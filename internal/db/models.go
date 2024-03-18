@@ -8,6 +8,12 @@ import (
 	"database/sql"
 )
 
+type Session struct {
+	Token  string  `json:"token"`
+	Data   []byte  `json:"data"`
+	Expiry float64 `json:"expiry"`
+}
+
 type Todo struct {
 	ID          int64          `json:"id"`
 	UserID      int64          `json:"user_id"`

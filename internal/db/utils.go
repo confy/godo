@@ -10,8 +10,13 @@ import (
 //go:embed schema.sql
 var Schema string
 
+// Drop all tables - only for development purposes
 func dropTables(ctx context.Context, db *sql.DB) error {
-	_, err := db.ExecContext(ctx, "DROP TABLE IF EXISTS todos")
+	_, err := db.ExecContext(ctx, "DROP TABLE IF EXISTS sessions")
+	if err != nil {
+		return err
+	}
+	_, err = db.ExecContext(ctx, "DROP TABLE IF EXISTS todos")
 	if err != nil {
 		return err
 	}

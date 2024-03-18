@@ -29,12 +29,8 @@ func addRoutes(
 	mux.HandleFunc("/test", middleware.RequireLogin(handler.HandleTestPage(database, session), session))
 }
 
-func New(config *Config, database *db.Queries) *http.Server {
+func New(config *Config, database *db.Queries, session *scs.SessionManager) *http.Server {
 	mux := http.NewServeMux()
-
-	session := scs.New()
-	session.Cookie.SameSite = http.SameSiteStrictMode
-	session.Cookie.Secure = config.UseHTTPS
 
 	oauth := &oauth2.Config{
 		RedirectURL:  config.GetHostURL() + "/callback",

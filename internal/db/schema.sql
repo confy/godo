@@ -16,3 +16,13 @@ CREATE TABLE IF NOT EXISTS todos(
     done        BOOLEAN default false,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+
+-- This table should be seperated into a different file
+CREATE TABLE IF NOT EXISTS sessions (
+	token TEXT PRIMARY KEY,
+	data BLOB NOT NULL,
+	expiry REAL NOT NULL
+);
+
+CREATE INDEX sessions_expiry_idx ON sessions(expiry);

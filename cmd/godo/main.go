@@ -4,11 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"log/slog"
+	"net/http"
 	"os"
 
+	"github.com/alexedwards/scs/v2"
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 
 	"github.com/confy/godo/internal/db"
+	"github.com/confy/godo/internal/libsqlstore"
 	"github.com/confy/godo/internal/server"
 )
 
@@ -43,6 +46,12 @@ func main() {
 
 	database := db.New(conn)
 
-	srv := server.New(config, database)
+	// Create a new session manager - we should change to a new session db eventually
+	session := scs.New()
+	session.Store = libsqlstore.New(conn)
+	session.Cookie.SameSite = http.SameSiteStrictMode
+	session.Cookie.Secure = config.UseHTTPS
+
+	srv := server.New(config, database, session)
 	server.Run(srv)
 }
