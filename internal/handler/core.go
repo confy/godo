@@ -20,13 +20,25 @@ func HandleTestPage(database *db.Queries, session *scs.SessionManager) http.Hand
 			return
 		}
 
-		todo, err := database.CreateTodo(context.Background(), db.CreateTodoParams{
-			UserID: user.ID,
-			Title:   "Test todo",
+		// Create a test todo on every request during development
+		_, err = database.CreateTodo(context.Background(), db.CreateTodoParams{
+			UserID:      user.ID,
+			Title:       "Test todo",
 			Description: sql.NullString{String: "This is a test todo", Valid: true},
 		})
 
-		templ.Handler(views.TestPage(user, todo)).ServeHTTP(w, r)
+		if err != nil {
+			http.Error(w, "Failed to create todo", http.StatusInternalServerError)
+			return
+		}
+
+		todos, err := database.GetTodosByUserId(context.Background(), user.ID)
+		if err != nil {
+			http.Error(w, "Failed to get todos", http.StatusInternalServerError)
+			return
+		}
+
+		templ.Handler(views.TestPage(user, todos)).ServeHTTP(w, r)
 	}
 }
 

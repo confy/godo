@@ -6,14 +6,15 @@ import (
 )
 
 
-templ TestPage(User db.User, todo db.Todo) {
+templ TestPage(User db.User, todos []db.Todo) {
 	<html>
 		@components.Header("Welcome")
 		<body>
 			<h1>Hello, {string(User.Login)}</h1>
             <h1>{string(User.Email)}</h1>
+			<img src={string(User.AvatarURL)} alt="avatar" />
 			<br></br>
-			@components.Todo(todo)
+			@components.TodoList(todos)
 		</body>
 	</html>
 }

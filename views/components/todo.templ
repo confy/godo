@@ -21,3 +21,11 @@ templ Todo(todo db.Todo) {
         <button hx-delete={"/todo/" + fmt.Sprint(todo.ID)} hx-target={"#todo" + fmt.Sprint(todo.ID)} hx-swap="outerHTML">❌</button>       
     </li>
 }
+
+templ TodoList(todos []db.Todo) {
+    <ul>
+        for _, todo := range todos {
+            @Todo(todo)
+        }
+    </ul>
+}
