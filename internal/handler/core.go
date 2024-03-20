@@ -20,15 +20,9 @@ func HandleTestPage(database *db.Queries, session *scs.SessionManager) http.Hand
 			return
 		}
 
-		// Create a test todo on every request during development
-		_, err = database.CreateTodo(context.Background(), db.CreateTodoParams{
-			UserID:      user.ID,
-			Title:       "Test todo",
-			Description: sql.NullString{String: "This is a test todo", Valid: true},
-		})
-
+		// TEST code
+		err = testCreateTodo(database, user, w)
 		if err != nil {
-			http.Error(w, "Failed to create todo", http.StatusInternalServerError)
 			return
 		}
 
@@ -40,6 +34,29 @@ func HandleTestPage(database *db.Queries, session *scs.SessionManager) http.Hand
 
 		templ.Handler(views.TestPage(user, todos)).ServeHTTP(w, r)
 	}
+}
+
+func testCreateTodo(database *db.Queries, user db.User, w http.ResponseWriter) error {
+	_, err := database.CreateTodo(context.Background(), db.CreateTodoParams{
+		UserID:      user.ID,
+		Title:       "Test todo",
+		Description: sql.NullString{String: "This is a test todo", Valid: true},
+	})
+	if err != nil {
+		http.Error(w, "Failed to create todo", http.StatusInternalServerError)
+		return err
+	}
+
+	_, err = database.CreateTodo(context.Background(), db.CreateTodoParams{
+		UserID:      user.ID,
+		Title:       "Test todo",
+		Description: sql.NullString{String: "This is a test todo", Valid: true},
+	})
+	if err != nil {
+		http.Error(w, "Failed to create todo", http.StatusInternalServerError)
+		return err
+	}
+	return err
 }
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
