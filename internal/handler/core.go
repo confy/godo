@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/a-h/templ"
 	"github.com/alexedwards/scs/v2"
@@ -61,9 +63,17 @@ func testCreateTodo(database *db.Queries, user db.User, w http.ResponseWriter) e
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		if _, err := os.Stat(filepath.Join("static", r.URL.Path)); err == nil {
+			http.ServeFile(w, r, "static"+r.URL.Path)
+			return
+		}
+		errorHandler(w, r, http.StatusNotFound)
 		return
 	}
 	templ.Handler(views.IndexPage("Hello, world!")).ServeHTTP(w, r)
+}
 
+func errorHandler(w http.ResponseWriter, r *http.Request, status int) {
+	w.WriteHeader(status)
+	w.Write([]byte("fancy custom 404 page!"))
 }
