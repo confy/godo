@@ -2,19 +2,25 @@ package views
 
 import (
     "github.com/confy/godo/internal/db"
+	"github.com/confy/godo/internal/models"
+
 	"github.com/confy/godo/views/components"
 )
 
 
-templ TestPage(User db.User, todos []db.Todo) {
+templ TestPage(user models.DisplayUser, todos []db.Todo) {
 	<html>
 		@components.Header("Welcome")
 		<body>
-			<h1>Hello, {string(User.Login)}</h1>
-            <h1>{string(User.Email)}</h1>
-			<img src={string(User.AvatarURL)} alt="avatar" />
-			<br></br>
-			@components.TodoList(todos)
+			<header class="container">
+				@components.Navbar(user)
+			</header>
+			<main class="container">
+				<h1>Hello, {string(user.Login)}</h1>
+				<h1>{string(user.Email)}</h1>
+				<br></br>
+				@components.TodoList(todos)
+			</main>
 		</body>
 	</html>
 }

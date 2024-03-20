@@ -25,7 +25,7 @@ func addRoutes(
 ) {
 	mux.HandleFunc("/login", handler.HandleAuthLogin(oauth))
 	mux.HandleFunc("/callback", handler.HandleAuthCallback(session, oauth, database))
-	mux.HandleFunc("/", handler.HandleRoot)
+	mux.HandleFunc("/", handler.HandleRoot(database, session))
 	mux.HandleFunc("/test", middleware.RequireLogin(handler.HandleTestPage(database, session), session))
 }
 

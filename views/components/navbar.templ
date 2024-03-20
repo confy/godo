@@ -1,0 +1,29 @@
+package components
+
+
+import (
+    "github.com/confy/godo/internal/models"
+)
+
+
+templ Navbar(user models.DisplayUser) {
+    <nav>
+        <ul>
+        <a href="/">
+            <li><img src="/logo.png" alt="GoDo" style="height: 40px;"></img></li>
+        </a>
+        <li><strong>GoDo</strong></li>
+    </ul>
+        <ul>
+            if user.LoggedIn {
+                <img src={user.AvatarURL} alt="Avatar" style="height: 40px; border-radius: 50%;"></img>
+                <li><a href="/todos">Todos</a></li>
+                <li><a href="/logout">Logout</a></li>
+            } else {
+                <li><a href="/login">Login</a></li>
+            }
+            
+        </ul>
+    </nav>
+
+}

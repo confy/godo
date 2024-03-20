@@ -2,13 +2,20 @@ package views
 
 import (
 	"github.com/confy/godo/views/components"
+	"github.com/confy/godo/internal/models"
 )
 
-templ IndexPage(greeting string) {
+templ IndexPage(greeting string, user models.DisplayUser) {
 	<html>
 		@components.Header("Welcome")
 		<body>
-			<h1>{ greeting }</h1>
-		</body>
+			<header class="container">
+				@components.Navbar(user)
+			</header>
+			<main class="container">
+				<h1>{ greeting }</h1>
+				<p>Welcome to the GoDo app. This is a simple todo app written in Go.</p>
+			</main>
+			</body>
 	</html>
 }
