@@ -40,9 +40,11 @@ func LoggingMiddleware() func(http.Handler) http.Handler {
 			next.ServeHTTP(wrapped, r)
 			slog.Info("Incoming request",
 				"status", wrapped.status,
-				"method", r.Method, "path",
-				r.URL.EscapedPath(), "duration",
-				time.Since(start))
+				"method", r.Method, 
+				"path", r.URL.EscapedPath(), 
+				"duration", time.Since(start),
+				"source", r.RemoteAddr,
+			)
 		})
 	}
 }
