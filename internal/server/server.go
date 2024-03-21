@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
+	"github.com/confy/godo/config"
 	"github.com/confy/godo/internal/db"
 	"github.com/confy/godo/internal/handler"
 	"github.com/confy/godo/internal/middleware"
@@ -24,18 +25,19 @@ func addRoutes(
 	database *db.Queries,
 ) {
 	mux.HandleFunc("/login", handler.HandleAuthLogin(oauth))
+	mux.HandleFunc("/logout", handler.HandleAuthLogout(session))
 	mux.HandleFunc("/callback", handler.HandleAuthCallback(session, oauth, database))
 	mux.HandleFunc("/", handler.HandleRoot(database, session))
 	mux.HandleFunc("/test", middleware.RequireLogin(handler.HandleTestPage(database, session), session))
 }
 
-func New(config *Config, database *db.Queries, session *scs.SessionManager) *http.Server {
+func New(cfg *config.Config, database *db.Queries, session *scs.SessionManager) *http.Server {
 	mux := http.NewServeMux()
 
 	oauth := &oauth2.Config{
-		RedirectURL:  config.GetHostURL() + "/callback",
-		ClientID:     config.GithubClientID,
-		ClientSecret: config.GithubClientSecret,
+		RedirectURL:  cfg.GetHostURL() + "/callback",
+		ClientID:     cfg.GithubClientID,
+		ClientSecret: cfg.GithubClientSecret,
 		Endpoint:     github.Endpoint,
 	}
 
@@ -45,9 +47,9 @@ func New(config *Config, database *db.Queries, session *scs.SessionManager) *htt
 	handler = session.LoadAndSave(handler)
 
 	server := &http.Server{
-		Addr:              net.JoinHostPort(config.Host, config.Port),
+		Addr:              net.JoinHostPort(cfg.Host, cfg.Port),
 		Handler:           handler,
-		ErrorLog:          slog.NewLogLogger(slog.Default().Handler(), config.LogLevel),
+		ErrorLog:          slog.NewLogLogger(slog.Default().Handler(), cfg.LogLevel),
 		ReadTimeout:       1 * time.Second,
 		WriteTimeout:      1 * time.Second,
 		IdleTimeout:       30 * time.Second,

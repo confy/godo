@@ -18,6 +18,14 @@ func HandleAuthLogin(oauth *oauth2.Config) http.HandlerFunc {
 	}
 }
 
+func HandleAuthLogout(session *scs.SessionManager) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Clear the session and redirect to the home page
+		session.Destroy(r.Context())
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+
 func HandleAuthCallback(
 	session *scs.SessionManager,
 	oauth *oauth2.Config,
