@@ -27,8 +27,9 @@ func addRoutes(
 	mux.HandleFunc("/login", handler.HandleAuthLogin(oauth))
 	mux.HandleFunc("/logout", handler.HandleAuthLogout(session))
 	mux.HandleFunc("/callback", handler.HandleAuthCallback(session, oauth, database))
+
 	mux.HandleFunc("/", handler.HandleRoot(database, session))
-	mux.HandleFunc("/test", middleware.RequireLogin(handler.HandleTestPage(database, session), session))
+	mux.HandleFunc("/todos", middleware.RequireLogin(handler.HandleTodos(database, session), session))
 }
 
 func New(cfg *config.Config, database *db.Queries, session *scs.SessionManager) *http.Server {

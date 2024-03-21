@@ -11,11 +11,7 @@ templ Todo(todo db.Todo) {
         <input type="checkbox" id={"todo" + fmt.Sprint(todo.ID)} name={"todo" + fmt.Sprint(todo.ID)} hx-post={"/todo/" + fmt.Sprint(todo.ID)} hx-target={"#todo" + fmt.Sprint(todo.ID)} hx-swap="outerHTML"></input>
         <label for={"todo" + fmt.Sprint(todo.ID)}>
             <span>{ fmt.Sprint(todo.Title) }</span>
-            <span>
-                
-                    { fmt.Sprint(todo.Description.String) }
-                
-            </span>
+            <span>{ fmt.Sprint(todo.Description.String) }</span>
         </label>
         <button hx-get={"/todo/" + fmt.Sprint(todo.ID)} hx-target={"#todo" + fmt.Sprint(todo.ID)} hx-swap="outerHTML">✏️</button>
         <button hx-delete={"/todo/" + fmt.Sprint(todo.ID)} hx-target={"#todo" + fmt.Sprint(todo.ID)} hx-swap="outerHTML">❌</button>       
