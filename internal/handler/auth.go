@@ -8,13 +8,16 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/confy/godo/internal/db"
+	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 )
 
 func HandleAuthLogin(oauth *oauth2.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Redirect to the OAuth2 login page
-		http.Redirect(w, r, oauth.AuthCodeURL("state"), http.StatusSeeOther)
+		state := uuid.NewString()
+		http.Redirect(w, r, oauth.AuthCodeURL(state), http.StatusSeeOther)
+		
 	}
 }
 
@@ -36,21 +39,21 @@ func HandleAuthCallback(
 		// Exchange the code for a token
 		token, err := oauth.Exchange(context.Background(), code)
 		if err != nil {
-			http.Error(w, "Failed to exchange token", http.StatusInternalServerError)
+			errorHandler(w, r, "Failed to exchange token", http.StatusInternalServerError)
 			return
 		}
 
 		// Get the user information
 		user, err := getUserInfo(oauth.Client(context.Background(), token))
 		if err != nil {
-			http.Error(w, "Failed to get user information", http.StatusInternalServerError)
+			errorHandler(w, r, "Failed to get user information", http.StatusInternalServerError)
 			return
 		}
 
 		// Create or get the user in the database
 		dbUser, err := db.CreateOrGetUser(context.Background(), database, user)
 		if err != nil {
-			http.Error(w, "Failed to create or get user", http.StatusInternalServerError)
+			errorHandler(w, r, "Failed to create or get user", http.StatusInternalServerError)
 			return
 		}
 
