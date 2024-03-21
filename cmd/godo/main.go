@@ -10,13 +10,14 @@ import (
 	"github.com/alexedwards/scs/v2"
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 
+	"github.com/confy/godo/config"
 	"github.com/confy/godo/internal/db"
 	"github.com/confy/godo/internal/libsqlstore"
 	"github.com/confy/godo/internal/server"
 )
 
 func main() {
-	config, err := server.LoadConfig()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -24,13 +25,13 @@ func main() {
 	logger := slog.New(
 		slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			AddSource: true,
-			Level:     config.LogLevel,
+			Level:     cfg.LogLevel,
 		}),
 	)
 	slog.SetDefault(logger)
 
 	// Connect to the database
-	dbURL := config.GetDBURL()
+	dbURL := cfg.GetDBURL()
 	conn, err := sql.Open("libsql", dbURL)
 	if err != nil {
 		panic(err)
@@ -50,8 +51,8 @@ func main() {
 	session := scs.New()
 	session.Store = libsqlstore.New(conn)
 	session.Cookie.SameSite = http.SameSiteStrictMode
-	session.Cookie.Secure = config.UseHTTPS
+	session.Cookie.Secure = cfg.UseHTTPS
 
-	srv := server.New(config, database, session)
+	srv := server.New(cfg, database, session)
 	server.Run(srv)
 }
