@@ -1,14 +1,13 @@
 package views
 
 import (
-    "github.com/confy/godo/internal/db"
 	"github.com/confy/godo/internal/models"
 
 	"github.com/confy/godo/views/components"
 )
 
 
-templ TodoPage(user models.DisplayUser, todos []db.Todo) {
+templ TodoPage(user models.DisplayUser, todos []models.DisplayTodo) {
 	<html>
 		@components.Header("Welcome")
 		<body>

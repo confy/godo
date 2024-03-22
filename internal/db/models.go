@@ -19,7 +19,7 @@ type Todo struct {
 	UserID      int64          `json:"user_id"`
 	CreatedAt   sql.NullTime   `json:"created_at"`
 	UpdatedAt   sql.NullTime   `json:"updated_at"`
-	DeletedAt   sql.NullTime   `json:"deleted_at"`
+	CompletedAt sql.NullTime   `json:"completed_at"`
 	Title       string         `json:"title"`
 	Description sql.NullString `json:"description"`
 	Done        sql.NullBool   `json:"done"`

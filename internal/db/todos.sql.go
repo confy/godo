@@ -11,7 +11,7 @@ import (
 )
 
 const createTodo = `-- name: CreateTodo :one
-INSERT INTO todos (user_id, title, description, done) VALUES (?, ?, ?, ?) RETURNING id, user_id, created_at, updated_at, deleted_at, title, description, done
+INSERT INTO todos (user_id, title, description, done) VALUES (?, ?, ?, ?) RETURNING id, user_id, created_at, updated_at, completed_at, title, description, done
 `
 
 type CreateTodoParams struct {
@@ -34,7 +34,7 @@ func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) (Todo, e
 		&i.UserID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.DeletedAt,
+		&i.CompletedAt,
 		&i.Title,
 		&i.Description,
 		&i.Done,
@@ -52,7 +52,7 @@ func (q *Queries) DeleteTodo(ctx context.Context, id int64) error {
 }
 
 const getTodoById = `-- name: GetTodoById :one
-SELECT id, user_id, created_at, updated_at, deleted_at, title, description, done FROM todos WHERE id = ?
+SELECT id, user_id, created_at, updated_at, completed_at, title, description, done FROM todos WHERE id = ?
 `
 
 func (q *Queries) GetTodoById(ctx context.Context, id int64) (Todo, error) {
@@ -63,7 +63,7 @@ func (q *Queries) GetTodoById(ctx context.Context, id int64) (Todo, error) {
 		&i.UserID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.DeletedAt,
+		&i.CompletedAt,
 		&i.Title,
 		&i.Description,
 		&i.Done,
@@ -72,7 +72,7 @@ func (q *Queries) GetTodoById(ctx context.Context, id int64) (Todo, error) {
 }
 
 const getTodosByUserId = `-- name: GetTodosByUserId :many
-SELECT id, user_id, created_at, updated_at, deleted_at, title, description, done FROM todos WHERE user_id = ?
+SELECT id, user_id, created_at, updated_at, completed_at, title, description, done FROM todos WHERE user_id = ?
 `
 
 func (q *Queries) GetTodosByUserId(ctx context.Context, userID int64) ([]Todo, error) {
@@ -89,7 +89,7 @@ func (q *Queries) GetTodosByUserId(ctx context.Context, userID int64) ([]Todo, e
 			&i.UserID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.DeletedAt,
+			&i.CompletedAt,
 			&i.Title,
 			&i.Description,
 			&i.Done,

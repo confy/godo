@@ -6,14 +6,14 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS todos(
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id     INTEGER NOT NULL,
-    created_at  DATETIME default current_timestamp, 
-    updated_at  DATETIME default current_timestamp,
-    deleted_at  DATETIME default null,
-    title       TEXT NOT NULL,
-    description TEXT,
-    done        BOOLEAN default false,
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL,
+    created_at      DATETIME default current_timestamp, 
+    updated_at      DATETIME default current_timestamp,
+    completed_at    DATETIME default null,
+    title           TEXT NOT NULL,
+    description     TEXT,
+    done            BOOLEAN default false,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

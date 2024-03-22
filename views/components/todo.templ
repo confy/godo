@@ -3,22 +3,22 @@ package components
 
 import (
     "fmt"
-    "github.com/confy/godo/internal/db"
+    "github.com/confy/godo/internal/models"
 )
 
-templ Todo(todo db.Todo) {
-    <li id={"todo" + fmt.Sprint(todo.ID)}>
-        <input type="checkbox" id={"todo" + fmt.Sprint(todo.ID)} name={"todo" + fmt.Sprint(todo.ID)} hx-post={"/todo/" + fmt.Sprint(todo.ID)} hx-target={"#todo" + fmt.Sprint(todo.ID)} hx-swap="outerHTML"></input>
-        <label for={"todo" + fmt.Sprint(todo.ID)}>
+templ Todo(todo models.DisplayTodo) {
+    <li id={ todo.DOMID }>
+        <input type="checkbox" id={ todo.DOMID } hx-post={ todo.Route } hx-target={ todo.Target } hx-swap="outerHTML"></input>
+        <label for={ todo.DOMID }>
             <span>{ fmt.Sprint(todo.Title) }</span>
-            <span>{ fmt.Sprint(todo.Description.String) }</span>
+            <span>{ fmt.Sprint(todo.Description) }</span>
         </label>
-        <button hx-get={"/todo/" + fmt.Sprint(todo.ID)} hx-target={"#todo" + fmt.Sprint(todo.ID)} hx-swap="outerHTML">✏️</button>
-        <button hx-delete={"/todo/" + fmt.Sprint(todo.ID)} hx-target={"#todo" + fmt.Sprint(todo.ID)} hx-swap="outerHTML">❌</button>       
+        <button hx-get={ todo.Route } hx-target={ todo.Target } hx-swap="outerHTML">✏️</button>
+        <button hx-delete={ todo.Route } hx-target={ todo.Target } hx-swap="outerHTML">❌</button>       
     </li>
 }
 
-templ TodoList(todos []db.Todo) {
+templ TodoList(todos []models.DisplayTodo) {
     <ul>
         for _, todo := range todos {
             @Todo(todo)

@@ -90,8 +90,13 @@ func HandleTodos(database *db.Queries, session *scs.SessionManager) http.Handler
 			Email:     user.Email,
 			AvatarURL: user.AvatarURL,
 		}
+		displayTodos := make([]models.DisplayTodo, len(todos))
+		for i, todo := range todos {
+			displayTodos[i] = models.DisplayTodoFromTodo(todo)
+		}
+		
 		templ.Handler(
-			views.TodoPage(displayUser, todos), 
+			views.TodoPage(displayUser, displayTodos), 
 			templ.WithStatus(http.StatusOK),
 		).ServeHTTP(w, r)
 	}
