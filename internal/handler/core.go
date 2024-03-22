@@ -17,14 +17,14 @@ import (
 
 func errorHandler(w http.ResponseWriter, _ *http.Request, message string, status int) {
 	w.WriteHeader(status)
-	w.Write([]byte(strconv.Itoa(status) + " " + message))	
+	w.Write([]byte(strconv.Itoa(status) + " " + message))
 }
 
 func getDisplayUser(userID int64, database *db.Queries) (models.DisplayUser, error) {
 	if userID == 0 {
 		return models.DisplayUser{LoggedIn: false}, nil
 	}
-	
+
 	user, err := database.GetUserById(context.Background(), userID)
 	if err != nil {
 		return models.DisplayUser{}, err
@@ -56,12 +56,11 @@ func HandleRoot(database *db.Queries, session *scs.SessionManager) http.HandlerF
 		}
 
 		templ.Handler(
-			views.IndexPage("Hello, world!", displayUser), 
+			views.IndexPage("Hello, world!", displayUser),
 			templ.WithStatus(http.StatusOK),
 		).ServeHTTP(w, r)
 	}
 }
-
 
 func HandleTodos(database *db.Queries, session *scs.SessionManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -94,9 +93,9 @@ func HandleTodos(database *db.Queries, session *scs.SessionManager) http.Handler
 		for i, todo := range todos {
 			displayTodos[i] = models.DisplayTodoFromTodo(todo)
 		}
-		
+
 		templ.Handler(
-			views.TodoPage(displayUser, displayTodos), 
+			views.TodoPage(displayUser, displayTodos),
 			templ.WithStatus(http.StatusOK),
 		).ServeHTTP(w, r)
 	}
@@ -124,5 +123,3 @@ func testCreateTodo(database *db.Queries, user db.User, w http.ResponseWriter) e
 	}
 	return err
 }
-
-

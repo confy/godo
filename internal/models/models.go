@@ -25,8 +25,8 @@ func DisplayUserFromUser(user db.User) DisplayUser {
 type DisplayTodo struct {
 	ID          int
 	DOMID       string
-	Route 		string
-	Target		string
+	Route       string
+	Target      string
 	UserID      int
 	CreatedAt   string
 	UpdatedAt   string
@@ -38,12 +38,12 @@ type DisplayTodo struct {
 
 func DisplayTodoFromTodo(todo db.Todo) DisplayTodo {
 	strID := strconv.Itoa(int(todo.ID))
-	
+
 	return DisplayTodo{
 		ID:          int(todo.ID),
 		DOMID:       "todo-" + strID,
 		Route:       "/todo/" + strID,
-		Target:	     "#" + strID,
+		Target:      "#" + strID,
 		UserID:      int(todo.UserID),
 		CreatedAt:   todo.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 		UpdatedAt:   todo.UpdatedAt.Time.Format("2006-01-02 15:04:05"),

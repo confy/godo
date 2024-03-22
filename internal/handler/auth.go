@@ -17,7 +17,7 @@ func HandleAuthLogin(oauth *oauth2.Config) http.HandlerFunc {
 		// Redirect to the OAuth2 login page
 		state := uuid.NewString()
 		http.Redirect(w, r, oauth.AuthCodeURL(state), http.StatusSeeOther)
-		
+
 	}
 }
 
