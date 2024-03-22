@@ -30,6 +30,8 @@ func addRoutes(
 
 	mux.HandleFunc("GET /", handler.HandleRoot(database, session))
 	mux.HandleFunc("GET /todos", middleware.RequireLogin(handler.HandleTodos(database, session), session))
+
+	mux.HandleFunc("DELETE /todo/{id}", middleware.RequireLogin(handler.HandleDeleteTodo(database, session), session))
 }
 
 func New(cfg *config.Config, database *db.Queries, session *scs.SessionManager) *http.Server {
