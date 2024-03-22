@@ -24,12 +24,12 @@ func addRoutes(
 	oauth *oauth2.Config,
 	database *db.Queries,
 ) {
-	mux.HandleFunc("/login", handler.HandleAuthLogin(oauth))
-	mux.HandleFunc("/logout", handler.HandleAuthLogout(session))
-	mux.HandleFunc("/callback", handler.HandleAuthCallback(session, oauth, database))
+	mux.HandleFunc("GET /login", handler.HandleAuthLogin(oauth))
+	mux.HandleFunc("GET /logout", handler.HandleAuthLogout(session))
+	mux.HandleFunc("GET /callback", handler.HandleAuthCallback(session, oauth, database))
 
-	mux.HandleFunc("/", handler.HandleRoot(database, session))
-	mux.HandleFunc("/todos", middleware.RequireLogin(handler.HandleTodos(database, session), session))
+	mux.HandleFunc("GET /", handler.HandleRoot(database, session))
+	mux.HandleFunc("GET /todos", middleware.RequireLogin(handler.HandleTodos(database, session), session))
 }
 
 func New(cfg *config.Config, database *db.Queries, session *scs.SessionManager) *http.Server {

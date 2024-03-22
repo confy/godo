@@ -54,7 +54,11 @@ func HandleRoot(database *db.Queries, session *scs.SessionManager) http.HandlerF
 		if err != nil {
 			errorHandler(w, r, "Unable to get user from db", http.StatusInternalServerError)
 		}
-		templ.Handler(views.IndexPage("Hello, world!", displayUser)).ServeHTTP(w, r)
+
+		templ.Handler(
+			views.IndexPage("Hello, world!", displayUser), 
+			templ.WithStatus(http.StatusOK),
+		).ServeHTTP(w, r)
 	}
 }
 
@@ -86,7 +90,10 @@ func HandleTodos(database *db.Queries, session *scs.SessionManager) http.Handler
 			Email:     user.Email,
 			AvatarURL: user.AvatarURL,
 		}
-		templ.Handler(views.TodoPage(displayUser, todos)).ServeHTTP(w, r)
+		templ.Handler(
+			views.TodoPage(displayUser, todos), 
+			templ.WithStatus(http.StatusOK),
+		).ServeHTTP(w, r)
 	}
 }
 
