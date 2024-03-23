@@ -51,7 +51,7 @@ func LoadConfig() (*Config, error) {
 	port := os.Getenv("PORT")
 	dbURL := os.Getenv("DB_URL")
 	dbToken := os.Getenv("DB_TOKEN")
-	githubClientID := os.Getenv("OAUTH_GITHUB_ID")
+	githubClientID := os.Getenv("OAUTH_GITHUB_CLIENT_ID")
 	githubClientSecret := os.Getenv("OAUTH_GITHUB_SECRET")
 
 	var logLevel slog.Level
