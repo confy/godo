@@ -1,0 +1,38 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    environment: prod
+    concurrency: deploy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Get App Hostname
+        run: |
+          HOSTNAME=$(fly status --json | jq -r '.Hostname') 
+          echo "::set-env name=HOSTNAME::$HOSTNAME"
+
+      - name: Set/Update configuration
+        run: |
+          fly secrets set APP_ENV=${{ deployment.environment }}
+          fly secrets set HOST=$HOSTNAME
+          fly secrets set PORT=8080
+          fly secrets set DB_URL=${{ secrets.DB_URL }}
+          fly secrets set DB_TOKEN=${{ secrets.DB_TOKEN }}
+          fly secrets set LOG_LEVEL=debug
+          fly secrets set OAUTH_GITHUB_CLIENT_ID=${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+          fly secrets set OAUTH_GITHUB_SECRET=${{ secrets.OAUTH_GITHUB_SECRET }}
+
+      - name: Deploy
+        run: flyctl deploy
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
