@@ -43,7 +43,7 @@ func DisplayTodoFromTodo(todo db.Todo) DisplayTodo {
 		ID:          int(todo.ID),
 		DOMID:       "todo-" + strID,
 		Route:       "/todo/" + strID,
-		Target:      "#" + strID,
+		Target:      "#todo-" + strID,
 		UserID:      int(todo.UserID),
 		CreatedAt:   todo.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 		UpdatedAt:   todo.UpdatedAt.Time.Format("2006-01-02 15:04:05"),
