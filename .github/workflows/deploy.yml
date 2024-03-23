@@ -27,7 +27,8 @@ jobs:
         run: |
           hostname=$(flyctl status --json | jq -r '.Hostname')
           echo "deployment=https://$hostname" >> $GITHUB_OUTPUT
-          flyctl secrets set APP_ENV=prod \
+          flyctl secrets set --stage \
+            APP_ENV=prod \
             HOST_IP=0.0.0.0 \
             HOSTNAME=$hostname \
             PORT=8080 \
