@@ -50,7 +50,7 @@ func New(cfg *config.Config, database *db.Queries, session *scs.SessionManager) 
 	handler = session.LoadAndSave(handler)
 
 	server := &http.Server{
-		Addr:              net.JoinHostPort(cfg.Host, cfg.Port),
+		Addr:              net.JoinHostPort(cfg.HostIP, cfg.Port),
 		Handler:           handler,
 		ErrorLog:          slog.NewLogLogger(slog.Default().Handler(), cfg.LogLevel),
 		ReadTimeout:       1 * time.Second,

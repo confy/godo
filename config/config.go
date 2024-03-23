@@ -10,7 +10,8 @@ import (
 )
 
 type Config struct {
-	Host               string
+	HostIP             string
+	Hostname 		   string
 	Port               string
 	DBURL              string
 	DBToken            string
@@ -27,7 +28,7 @@ func (c *Config) GetHostURL() string {
 	if c.UseHTTPS {
 		protocol = "https"
 	}
-	return fmt.Sprintf("%s://%s:%s", protocol, c.Host, c.Port)
+	return fmt.Sprintf("%s://%s:%s", protocol, c.Hostname, c.Port)
 }
 
 // GetDBURL returns the database URL with the auth token
@@ -47,7 +48,8 @@ func LoadConfig() (*Config, error) {
 
 	appEnv := os.Getenv("APP_ENV")
 	useHTTPS := appEnv == "prod"
-	host := os.Getenv("HOST")
+	hostIP := os.Getenv("HOST_IP")
+	hostname := os.Getenv("HOSTNAME")
 	port := os.Getenv("PORT")
 	dbURL := os.Getenv("DB_URL")
 	dbToken := os.Getenv("DB_TOKEN")
@@ -67,7 +69,8 @@ func LoadConfig() (*Config, error) {
 	}
 
 	if appEnv == "" ||
-		host == "" ||
+		hostIP == "" ||
+		hostname == "" ||
 		port == "" ||
 		dbURL == "" ||
 		dbToken == "" ||
@@ -77,7 +80,8 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return &Config{
-		Host:               host,
+		HostIP: 		    hostIP,
+		Hostname:           hostname,
 		Port:               port,
 		DBURL:              dbURL,
 		DBToken:            dbToken,
