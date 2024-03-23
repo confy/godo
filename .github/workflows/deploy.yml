@@ -11,7 +11,9 @@ jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
-    environment: prod
+    environment:
+      name: prod
+      url: ${{ steps.Update-config.outputs.deployment }}
     concurrency: deploy
     steps:
       - name: Checkout
@@ -20,9 +22,10 @@ jobs:
       - name: Setup flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Set/Update configuration
+      - name: Update config
         run: |
           hostname=$(flyctl status --json | jq -r '.Hostname')
+          echo deployment=https://$hostname >> $GITHUB_OUTPUT
           flyctl secrets set APP_ENV=prod \
             HOST_IP=0.0.0.0 \
             HOSTNAME=$hostname \
