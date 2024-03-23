@@ -23,14 +23,14 @@ jobs:
       - name: Set/Update configuration
         run: |
           HOSTNAME=$(flyctl status --json | jq -r '.Hostname')
-          flyctl secrets set APP_ENV=prod
-          flyctl secrets set HOST=$HOSTNAME
-          flyctl secrets set PORT=8080
-          flyctl secrets set DB_URL=${{ secrets.DB_URL }}
-          flyctl secrets set DB_TOKEN=${{ secrets.DB_TOKEN }}
-          flyctl secrets set LOG_LEVEL=debug
-          flyctl secrets set OAUTH_GITHUB_CLIENT_ID=${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
-          flyctl secrets set OAUTH_GITHUB_SECRET=${{ secrets.OAUTH_GITHUB_SECRET }}
+          flyctl secrets set APP_ENV=prod \
+            HOST=$HOSTNAME \
+            PORT=8080 \
+            DB_URL=${{ secrets.DB_URL }} \
+            DB_TOKEN=${{ secrets.DB_TOKEN }} \
+            LOG_LEVEL=debug \
+            OAUTH_GITHUB_CLIENT_ID=${{ secrets.OAUTH_GITHUB_CLIENT_ID }} \
+            OAUTH_GITHUB_SECRET=${{ secrets.OAUTH_GITHUB_SECRET }}
           echo "Deploying to $HOSTNAME"
 
       - name: Deploy
