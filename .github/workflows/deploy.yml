@@ -22,8 +22,10 @@ jobs:
 
       - name: Set/Update configuration
         run: |
+          hostname=$(flyctl status --json | jq -r '.Hostname')
           flyctl secrets set APP_ENV=prod \
-            HOST=0.0.0.0 \
+            HOST_IP=0.0.0.0 \
+            HOSTNAME=$hostname \
             PORT=8080 \
             DB_URL=${{ secrets.DB_URL }} \
             DB_TOKEN=${{ secrets.DB_TOKEN }} \
