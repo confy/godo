@@ -28,6 +28,10 @@ func (c *Config) GetHostURL() string {
 	if c.UseHTTPS {
 		protocol = "https"
 	}
+
+	if c.AppEnv == "prod" {
+		return fmt.Sprintf("%s://%s", protocol, c.Hostname)
+	}
 	return fmt.Sprintf("%s://%s:%s", protocol, c.Hostname, c.Port)
 }
 
