@@ -20,21 +20,18 @@ jobs:
       - name: Setup flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Get App Hostname
-        run: |
-          HOSTNAME=$(flyctl status --json | jq -r '.Hostname') 
-          echo "::set-output name=HOSTNAME::$HOSTNAME"
-
       - name: Set/Update configuration
         run: |
+          HOSTNAME=$(flyctl status --json | jq -r '.Hostname')
           flyctl secrets set APP_ENV=prod
-          flyctl secrets set HOST=${{ steps.Get-App-Hostname.outputs.HOSTNAME }}
+          flyctl secrets set HOST=$HOSTNAME
           flyctl secrets set PORT=8080
           flyctl secrets set DB_URL=${{ secrets.DB_URL }}
           flyctl secrets set DB_TOKEN=${{ secrets.DB_TOKEN }}
           flyctl secrets set LOG_LEVEL=debug
           flyctl secrets set OAUTH_GITHUB_CLIENT_ID=${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
           flyctl secrets set OAUTH_GITHUB_SECRET=${{ secrets.OAUTH_GITHUB_SECRET }}
+          echo "Deploying to $HOSTNAME"
 
       - name: Deploy
         run: flyctl deploy
