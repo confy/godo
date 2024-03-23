@@ -23,7 +23,7 @@ jobs:
 
       - name: Set/Update configuration
         run: |
-          fly secrets set APP_ENV=${{ deployment.environment }}
+          fly secrets set APP_ENV=prod
           fly secrets set HOST=$HOSTNAME
           fly secrets set PORT=8080
           fly secrets set DB_URL=${{ secrets.DB_URL }}
