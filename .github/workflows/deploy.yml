@@ -19,12 +19,12 @@ jobs:
       - name: Get App Hostname
         run: |
           HOSTNAME=$(fly status --json | jq -r '.Hostname') 
-          echo "::set-env name=HOSTNAME::$HOSTNAME"
+          echo "::set-output name=HOSTNAME::$HOSTNAME"
 
       - name: Set/Update configuration
         run: |
           fly secrets set APP_ENV=prod
-          fly secrets set HOST=$HOSTNAME
+          fly secrets set HOST=${{ steps.Get-App-Hostname.outputs.HOSTNAME }}
           fly secrets set PORT=8080
           fly secrets set DB_URL=${{ secrets.DB_URL }}
           fly secrets set DB_TOKEN=${{ secrets.DB_TOKEN }}
