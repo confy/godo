@@ -9,15 +9,26 @@ import (
 
 templ TodoPage(user models.DisplayUser, todos []models.DisplayTodo) {
 	<html>
-		@components.Header("Welcome")
+		@components.Header("My Todos")
+		
 		<body>
 			<header class="container">
 				@components.Navbar(user)
 			</header>
 			<main class="container">
-				<h1>Hello, {string(user.Login)}</h1>
-				<h1>{string(user.Email)}</h1>
-				<br></br>
+				<hgroup>
+					<h1>Hello, {string(user.Login)}!</h1>
+					<p>What do you want to do today?</p>
+				</hgroup>
+				<hr />
+				<form id="add-todo" action="/todos" method="post">
+					<fieldset role="group">
+						<input name="title" placeholder="Title" />
+						<input name="description" placeholder="Description" />
+						<input type="submit" value="Add" />
+					</fieldset>
+				</form>
+				<hr />
 				@components.TodoList(todos)
 			</main>
 		</body>

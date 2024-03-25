@@ -30,6 +30,7 @@ func addRoutes(
 
 	mux.HandleFunc("GET /", handler.HandleRoot(database, session))
 	mux.HandleFunc("GET /todos", middleware.RequireLogin(handler.HandleTodos(database, session), session))
+	mux.HandleFunc("GET /test", handler.HandleTestPage())
 
 	mux.HandleFunc("DELETE /todo/{id}", middleware.RequireLogin(handler.HandleDeleteTodo(database, session), session))
 }

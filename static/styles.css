@@ -1,0 +1,33 @@
+/* li[id^="todo-"] {
+    font-family: Pacifico;
+} */
+
+
+/* [id^="todo-"] span {
+    font-size: 20px;
+} */
+
+[id^="todo-"] input[type="checkbox"] {
+    flex: unset;
+}
+
+[id^="todo-"] button {
+    width: 200px;
+    flex: unset;
+}
+
+
+ul#todo-list {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+/* form#add-todo {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 0px 0px 0px 0px;
+} */

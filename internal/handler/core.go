@@ -62,6 +62,40 @@ func HandleRoot(database *db.Queries, session *scs.SessionManager) http.HandlerF
 	}
 }
 
+func HandleTestPage() http.HandlerFunc {
+	// I keep getting banned from the github API :) so here
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := models.DisplayUser{
+			LoggedIn:  false,
+			Login: "confy",
+		}
+
+		todos := []models.DisplayTodo{
+			{
+				ID:          1,
+				DOMID: 	 "todo-1",
+				Target: "#todo-1",
+				Route: "/todo/1",
+				Title:       "Test todo",
+				Description: "This is a test todo",
+			},
+			{
+				ID:          2,
+				DOMID: 	 "todo-2",
+				Target: "#todo-2",
+				Route: "/todo/2",
+				Title:       "Test todo for the second time",
+				Description: "This is a test todo with more info!",
+			},
+		}
+
+		templ.Handler(
+			views.TodoPage(user, todos),
+			templ.WithStatus(http.StatusOK),
+		).ServeHTTP(w, r)
+	}
+}
+
 func HandleTodos(database *db.Queries, session *scs.SessionManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := session.GetInt64(r.Context(), "userID")

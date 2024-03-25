@@ -40,12 +40,12 @@ func Navbar(user models.DisplayUser) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" alt=\"Avatar\" style=\"height: 40px; border-radius: 50%;\"><li><a href=\"/todos\">Todos</a></li><li><a href=\"/logout\">Logout</a></li>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" alt=\"Avatar\" style=\"height: 40px; border-radius: 50%;\"><li><a href=\"/todos\">My Todos</a></li><li><a href=\"/logout\">Logout</a></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/login\">Login</a></li>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/login\">Login with GitHub</a></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

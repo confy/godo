@@ -5,21 +5,33 @@ import (
     "fmt"
     "github.com/confy/godo/internal/models"
 )
+templ EditTodo(todo models.DisplayTodo) {
+    <div id={ todo.DOMID }>
+        <form role="group">
+            <input type="text" name="title" value={ todo.Title }></input>
+            <input type="text" name="description" value={ todo.Description }></input>
+            <button type="submit">✅</button>
+        </form>
+        <hr />
+    </div>
+}
 
 templ Todo(todo models.DisplayTodo) {
-    <li id={ todo.DOMID }>
-        <input type="checkbox" id={ todo.DOMID } hx-post={ todo.Route } hx-target={ todo.Target } hx-swap="outerHTML"></input>
-        <label for={ todo.DOMID }>
-            <span>{ fmt.Sprint(todo.Title) }</span>
-            <span>{ fmt.Sprint(todo.Description) }</span>
-        </label>
-        <button hx-get={ todo.Route } hx-target={ todo.Target } hx-swap="outerHTML">✏️</button>
-        <button hx-delete={ todo.Route } hx-target={ todo.Target } hx-swap="outerHTML">❌</button>       
-    </li>
+    <div id={ todo.DOMID }>
+        <li role="group">
+            <input type="checkbox" hx-post={ todo.Route } hx-target={ todo.Target } hx-swap="outerHTML"></input>
+            <p>{ fmt.Sprint(todo.Title) }</p>
+            <p>{ fmt.Sprint(todo.Description) }</p>
+            <button hx-get={ todo.Route } hx-target={ todo.Target } hx-swap="outerHTML">✏️</button>
+            <button hx-delete={ todo.Route } hx-target={ todo.Target } hx-swap="outerHTML">❌</button>       
+        </li>
+        <hr />
+    </div>
 }
 
 templ TodoList(todos []models.DisplayTodo) {
-    <ul>
+    <ul id="todo-list">
+        @EditTodo(models.DisplayTodo{Title: "New Todo", Description: "New Description", Route: "/todos", Target: "#todo-list"})
         for _, todo := range todos {
             @Todo(todo)
         }
