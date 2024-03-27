@@ -10,8 +10,7 @@ import (
 )
 
 type Config struct {
-	HostIP             string
-	Hostname 		   string
+	Hostname           string
 	Port               string
 	DBURL              string
 	DBToken            string
@@ -52,7 +51,6 @@ func LoadConfig() (*Config, error) {
 
 	appEnv := os.Getenv("APP_ENV")
 	useHTTPS := appEnv == "prod"
-	hostIP := os.Getenv("HOST_IP")
 	hostname := os.Getenv("HOSTNAME")
 	port := os.Getenv("PORT")
 	dbURL := os.Getenv("DB_URL")
@@ -73,7 +71,6 @@ func LoadConfig() (*Config, error) {
 	}
 
 	if appEnv == "" ||
-		hostIP == "" ||
 		hostname == "" ||
 		port == "" ||
 		dbURL == "" ||
@@ -84,7 +81,6 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return &Config{
-		HostIP: 		    hostIP,
 		Hostname:           hostname,
 		Port:               port,
 		DBURL:              dbURL,
