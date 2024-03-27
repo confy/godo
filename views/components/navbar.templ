@@ -22,6 +22,20 @@ templ Navbar(user models.DisplayUser) {
         } else {
             <li><a href="/login">Login with GitHub</a></li>
         }
+        
+        <li>
+            <details class="dropdown">
+                <summary>
+                    Account
+                </summary>
+                <ul dir="rtl">
+                <li>
+                    <p style="display: inline;">Dark Mode </p>
+                    <input id="dark-mode" type="checkbox" role="switch"></input>
+                </li>
+                </ul>
+            </details>
+        </li>
         </ul>
     </nav>
 

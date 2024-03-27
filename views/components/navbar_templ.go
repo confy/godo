@@ -50,7 +50,7 @@ func Navbar(user models.DisplayUser) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><details class=\"dropdown\"><summary>Account</summary><ul dir=\"rtl\"><li><p style=\"display: inline;\">Dark Mode </p><input id=\"dark-mode\" type=\"checkbox\" role=\"switch\"></li></ul></details></li></ul></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
