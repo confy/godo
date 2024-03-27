@@ -29,7 +29,6 @@ jobs:
           echo "deployment=https://$hostname" >> $GITHUB_OUTPUT
           flyctl secrets set --stage \
             APP_ENV=prod \
-            HOST_IP=0.0.0.0 \
             HOSTNAME=$hostname \
             PORT=8080 \
             DB_URL=${{ secrets.DB_URL }} \
